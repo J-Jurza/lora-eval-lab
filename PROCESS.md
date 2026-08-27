@@ -1,0 +1,97 @@
+# The process, in plain language
+
+This file exists so that the person whose name is on the repo can explain every step
+without the agent in the room. Read it before each step, and after.
+
+## 0. What we are actually testing
+
+A base model (say Qwen2.5-1.5B-Instruct) can already turn a doctor-patient dialogue into
+something note-like if you ask it. Fine-tuning shows it a thousand examples of *how this
+dataset's notes are written*. The claim under test is narrow: **after fine-tuning, are the
+notes better, as judged blind by a rubric a clinician would accept?** Everything below is in
+service of answering that honestly. Loss curves are not the answer; preference is.
+
+## 1. Data (`data.py`)
+
+- Download MTS-Dialog. Each row is a dialogue, a section header (e.g. "History of Present
+  Illness"), and the reference note text for that section.
+- **Split by dialogue id, not by row**, into train / validation / held-out test. If the same
+  dialogue appears in train and test the result is contaminated. This is the first thing a
+  reviewer checks.
+- Freeze the held-out set: write its ids to `eval/holdout_ids.json` and never look at those
+  dialogues during development.
+- Format each training example as a chat: system instruction, the dialogue as the user turn,
+  the reference note as the assistant turn.
+
+**You should be able to say:** how many examples in each split, how the split was made, and
+why splitting by id matters.
+
+## 2. Base model generations first (`generate.py`)
+
+Before training anything, run the **untuned** base model over the held-out set with the same
+prompt and save every output. This is the control. Without it there is nothing to compare
+against, and "the fine-tuned model produces notes" is not a finding.
+
+## 3. Train (`train.py`, on Colab)
+
+- QLoRA: the base model is loaded in 4-bit to fit a free T4 GPU, and only small low-rank
+  adapter matrices are trained. The base weights never change.
+- Hyperparameters are few and recorded: rank, alpha, learning rate, epochs, max sequence
+  length. Defaults from the Unsloth docs, changed only with a reason written in
+  `DECISIONS.md`.
+- Validation loss is watched for overfitting, and that is *all* it is used for.
+- Save the adapter (tens of MB), not the merged model.
+
+**You should be able to say:** what LoRA changes and what it leaves alone, why 4-bit, what the
+adapter file is, and roughly how long training took.
+
+## 4. Tuned model generations (`generate.py` again)
+
+Same held-out dialogues, same prompt, same decoding settings (temperature, max tokens), base
+model plus adapter. Save every output beside the base outputs. Now each held-out dialogue has
+three texts: reference, base output, tuned output.
+
+## 5. Blinded side-by-side judging (`judge.py`)
+
+- For each dialogue, present the judge with the dialogue, the reference, and the two outputs
+  labelled **A** and **B**, with **which one is the tuned model randomised** and the mapping
+  stored separately. The judge never knows.
+- The judge is an LLM (Gemini Flash on the free tier, as in rag-eval-lab) given the rubric in
+  `eval/rubric.md`: score A and B on faithfulness, completeness, format and concision, then
+  state a preference or a tie, with one sentence of reason.
+- Run each pair **twice with A/B swapped** and keep only consistent verdicts; position bias
+  is real and this is the cheap control for it.
+- **Human pass:** you judge 30 pairs blind yourself, same rubric, before looking at the
+  judge's answers. Agreement between you and the judge is reported. This is the step that
+  mirrors Heidi's clinician side-by-side, at portfolio scale.
+
+**You should be able to say:** why blinding, why the swap, why a human subset, and what
+agreement rate you saw.
+
+## 6. Metrics and the failure write-up (`evaluate.py`)
+
+- Win rate (tuned preferred), tie rate, with a bootstrap 95% confidence interval.
+- Per-dimension mean scores, base vs tuned.
+- ROUGE-L as a sanity check only, with the sentence "ROUGE rewards overlap, not
+  correctness" next to it.
+- **Failure taxonomy:** every pair the tuned model *lost*, hand-labelled: hallucinated fact,
+  omitted fact, wrong section, format break, other. This table is the most useful thing in
+  the repo, because it says what fine-tuning broke.
+
+## 7. Write it up
+
+README gets the numbers, the interval, the failure table and the honest sentence about
+what the result does and does not show. If the tuned model is at parity or worse, that is
+the write-up. A negative result with a clean method is a better portfolio piece than an
+inflated positive one.
+
+## What "done" means
+
+- Held-out ids frozen and never trained on.
+- Base and tuned generations committed.
+- Judge verdicts with swap-consistency filtering committed.
+- Human blind pass on 30 pairs committed.
+- Metrics with confidence intervals in the README.
+- Failure taxonomy table in the README.
+- Every non-obvious choice in `DECISIONS.md`.
+- You can explain steps 1 to 6 without notes.

@@ -1,0 +1,12 @@
+[project]
+name = "lora-eval-lab"
+version = "0.1.0"
+description = "LoRA fine-tune of a small open-weight model on clinical note generation, evaluated blind against its base"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.26", "datasets>=2.19", "transformers>=4.44", "peft>=0.12"]
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+judge = ["google-genai>=1.0"]
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

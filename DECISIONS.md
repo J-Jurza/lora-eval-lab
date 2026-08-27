@@ -26,3 +26,40 @@ One entry per choice that shapes the result. Git log says what changed; this say
 **Context:** LLM judges show position bias and fluency bias.
 **Decision:** Every pair judged twice with A/B swapped, verdicts kept only when consistent; 30 pairs judged blind by the author first; agreement reported.
 **Alternatives rejected:** Single-pass judging (position bias unmeasured); no human pass (no anchor for the judge).
+
+## 2026-08-28: The dataset's official split, with a duplicate check, not a home-made split
+**Context:** In MTS-Dialog every row is an independent dialogue snippet with its own id, so "split by id" is the same as "split by row" and guarantees nothing on its own. The dataset ships an official split (1,201 train / 100 validation / 200 test) used by the MEDIQA-Chat 2023 shared task.
+**Decision:** Use the official split. Freeze the official test ids in `eval/holdout_ids.json`. Check normalised dialogue text across splits and drop any held-out row whose dialogue also appears in train (the first inspection found 1 such row in test and 2 in validation); record the dropped ids.
+**Alternatives rejected:** Our own random split by id (not comparable to the literature, and no stronger against leakage); ignoring duplicates (the one form of leakage this dataset actually has).
+**Consequences:** 199 held-out pairs rather than 200; numbers are comparable to published MTS-Dialog results, which the README may cite for context only.
+
+## 2026-08-28: Train on all 20 section types, judge all held-out pairs, break out History of Present Illness
+**Context:** The data has 20 section headers, dominated by family/social history (351 train rows) and history of present illness (GENHX, 282). Many sections are one-line notes (allergies, medications). GENHX alone would leave 282 train and 53 test pairs.
+**Decision:** Train on every row, with the section header in the prompt so the model is conditioned on which section to write. Judge every held-out pair. Report the GENHX subset separately in the README, since it is the ambient-scribe case.
+**Alternatives rejected:** GENHX only (too few pairs; the interval would be uninformative); top five sections only (narrower story for no gain in rigour).
+**Consequences:** The headline number mixes easy one-line sections with hard ones; the per-section breakdown is therefore mandatory, not optional.
+
+## 2026-08-28: Zero-shot base as the control; one-shot prompted base as an optional second control
+**Context:** A zero-shot base model loses many pairs on format alone, which can hide whether fine-tuning changed faithfulness. The fairer question is "fine-tune versus good prompting".
+**Decision:** The zero-shot base is the primary control, as in `PROCESS.md`. If GPU time allows, a one-shot base (one fixed training example in the prompt) is generated and judged as a second column. It is never a replacement for the primary control.
+**Alternatives rejected:** One-shot as the only control (deviates from the written process mid-project); few-shot with several examples (prompt length on a T4, and picking the examples is another unrecorded choice).
+
+## 2026-08-28: Gemini Flash as judge, with a resumable cache and a stated fallback for the free-tier cap
+**Context:** 199 pairs judged twice is about 400 calls. Free-tier daily request caps are in the low hundreds and change without notice. Gemini is a different model family from Qwen, so the judge has no self-preference, and rag-eval-lab used the same judge.
+**Decision:** Every verdict is written to disk as it lands and reruns skip finished pairs, so the run can span days. If the cap blocks completion: first Flash-Lite, then a seeded random 120-pair subset, with whichever fallback was used stated in the README next to the numbers.
+**Alternatives rejected:** Claude or GPT as judge (paid; otherwise equivalent); single-pass judging to halve the calls (position bias unmeasured); giving up on the swap under quota pressure.
+
+## 2026-08-28: Swap-consistency rule
+**Decision:** A pair is kept when both orderings prefer the same model, or both say tie. Any other combination (including tie in one ordering and a preference in the other) is dropped, counted, and reported. A sensitivity line treats dropped pairs as ties.
+**Alternatives rejected:** Treating tie-plus-preference as a weak preference (imports the position bias the swap exists to remove).
+
+## 2026-08-28: Greedy decoding, identical for base and tuned
+**Decision:** Temperature 0 (greedy), same `max_new_tokens`, same prompt template and system instruction for both models. Recorded in each generations file.
+**Alternatives rejected:** Sampling (a second source of variance on top of a 199-pair sample, and non-reproducible outputs).
+
+## 2026-08-28: Adapter saved to Drive, not committed; thin hand-written notebook
+**Decision:** The adapter (tens of MB) goes to Google Drive, optionally attached to a GitHub release; the repo commits the training config, loss log and every generation. The Colab notebook is a handful of cells that install, clone and call the package; no logic lives in the notebook.
+**Alternatives rejected:** Committing the adapter (binary churn in a docs-and-code repo); a script-built, CI-executed notebook as in rag-eval-lab (this notebook needs a GPU, so CI cannot execute it; CI runs the tests only).
+
+## 2026-08-28: Colab free tier, Kaggle as the fallback GPU
+**Decision:** Colab T4. If Colab pre-empts twice, the same notebook runs on Kaggle (30 GPU hours a week). Unsloth needs CUDA, so a Mac is not an option for training.

@@ -15,16 +15,22 @@ service of answering that honestly. Loss curves are not the answer; preference i
 
 - Download MTS-Dialog. Each row is a dialogue, a section header (e.g. "History of Present
   Illness"), and the reference note text for that section.
-- **Split by dialogue id, not by row**, into train / validation / held-out test. If the same
-  dialogue appears in train and test the result is contaminated. This is the first thing a
-  reviewer checks.
+- Use the dataset's **official split** (1,201 train / 100 validation / 200 test). Each row is
+  its own dialogue snippet with its own id, so the split is already by dialogue. Then check
+  for the leakage this dataset actually has: the same dialogue text appearing in more than
+  one split. Any held-out row whose dialogue is also in train is dropped and its id recorded.
+  If the same dialogue appears in train and test the result is contaminated. This is the
+  first thing a reviewer checks.
 - Freeze the held-out set: write its ids to `eval/holdout_ids.json` and never look at those
   dialogues during development.
+- Every row keeps its section header (there are 20), and the header goes in the prompt so the
+  model knows which section to write. History of Present Illness is reported separately in
+  the write-up because it is the ambient-scribe case.
 - Format each training example as a chat: system instruction, the dialogue as the user turn,
   the reference note as the assistant turn.
 
-**You should be able to say:** how many examples in each split, how the split was made, and
-why splitting by id matters.
+**You should be able to say:** how many examples in each split, how the split was made, what
+the duplicate check found, and why leakage between splits matters.
 
 ## 2. Base model generations first (`generate.py`)
 

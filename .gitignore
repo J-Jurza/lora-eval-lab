@@ -1,5 +1,8 @@
-.venv/
+data/raw/
+data/cache/
 data/*.csv
+adapters/
+.venv/
 .env
 __pycache__/
 *.egg-info/

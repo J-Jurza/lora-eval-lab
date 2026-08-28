@@ -32,7 +32,7 @@ VERDICTS_PATH = RESULTS_DIR / "judge_verdicts.jsonl"
 BLIND_SEED = 20260828
 HUMAN_PAIRS = 30
 DIMENSIONS = ("faithfulness", "completeness", "format", "concision")
-DEFAULT_JUDGE = "gemini-2.5-flash"
+DEFAULT_JUDGE = "gemini-3.6-flash"
 SECONDS_BETWEEN_CALLS = 6.5
 
 
@@ -258,22 +258,19 @@ def done_keys(path: Path) -> set[tuple[str, bool]]:
     return {(r["id"], r["swapped"]) for r in read_jsonl(path)}
 
 
-def call_gemini(model: str, prompt: str, api_key: str, retries: int = 5) -> str:
+def call_gemini(model: str, prompt: str, client, retries: int = 5) -> str:
     """
     One judge call with backoff on rate limits.
 
     Args:
         model (str): Gemini model name.
         prompt (str): Filled judge prompt.
-        api_key (str): From GEMINI_API_KEY.
+        client: An open google.genai Client, shared across the run.
         retries (int): Attempts before giving up on a 429 or transient error.
 
     Returns:
         str: Raw reply text.
     """
-    from google import genai
-
-    client = genai.Client(api_key=api_key)
     for attempt in range(retries):
         try:
             reply = client.models.generate_content(
@@ -314,16 +311,17 @@ def run_judge(pairs: list[dict], key: dict[str, str], model: str, limit: int | N
         limit (int or None): Judge only the first N pairs (the quota fallback).
         out (Path): Verdicts file, appended to.
     """
-    api_key = load_api_key()
+    from google import genai
+
     done = done_keys(out)
     todo = [(p, s) for p in pairs[:limit] for s in (False, True) if (p["id"], s) not in done]
     print(f"judge: {len(done)} verdicts done, {len(todo)} to do")
 
     out.parent.mkdir(exist_ok=True)
-    with open(out, "a", encoding="utf-8") as fh:
+    with genai.Client(api_key=load_api_key()) as client, open(out, "a", encoding="utf-8") as fh:
         for n, (p, swapped) in enumerate(todo, 1):
             a, b = shown(p, key[p["id"]], swapped)
-            raw = call_gemini(model, judge_prompt(p, a, b), api_key)
+            raw = call_gemini(model, judge_prompt(p, a, b), client)
             row = {"id": p["id"], "swapped": swapped, "judge": model, "raw": raw}
             try:
                 v = parse_verdict(raw)

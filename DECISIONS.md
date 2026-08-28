@@ -92,3 +92,8 @@ One entry per choice that shapes the result. Git log says what changed; this say
 **Context:** After excluding the five contaminated rows, the tuned model still states an exact age that appears in the reference note and nowhere in the dialogue (in digits or in words) in 7 held-out rows; the base model does so far less. MTSamples notes have been public since the 2000s and are plausibly in Qwen2.5's pretraining; fine-tuning into MTSamples style may surface memorised text. Not proven; the alternative is inference from context, which the taxonomy pass will check case by case.
 **Decision:** No change to the pipeline. These are the cases the faithfulness dimension (judged against the dialogue, not the reference) and the "hallucinated fact" label exist to catch, and ROUGE-L will reward them, which is one more reason ROUGE is a sanity check only. The write-up reports the count and reads the 7 cases.
 **Alternatives rejected:** Filtering such outputs (would hide the behaviour the evaluation is for); switching base model (untestable claim that another model's pretraining is cleaner).
+
+## 2026-08-29: Judge model pinned to gemini-3.6-flash
+**Context:** The free-tier Flash model assumed when the judge was written (gemini-2.5-flash) is closed to new API keys; the API itself recommended gemini-3.6-flash. The key can also reach gemini-3.5-flash-lite.
+**Decision:** Pin `gemini-3.6-flash` as the judge and record it on every verdict row; `gemini-3.5-flash-lite` is the quota fallback named in the earlier entry. A dated version name rather than `gemini-flash-latest`, so a rerun next year judges with the same model or fails loudly.
+**Alternatives rejected:** `gemini-flash-latest` (silently changes the judge over time).

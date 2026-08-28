@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import time
 from pathlib import Path
 
@@ -30,7 +31,7 @@ CONFIG = {
     "lora_dropout": 0.0,
     "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
     "learning_rate": 2e-4,
-    "warmup_ratio": 0.05,
+    "warmup_fraction": 0.05,
     "lr_scheduler": "linear",
     "epochs": 2,
     "per_device_batch": 2,
@@ -127,6 +128,10 @@ def train(out_dir: Path, model_name: str | None = None) -> dict:
     train_ds = Dataset.from_list(to_conversations(train_rows))
     valid_ds = Dataset.from_list(to_conversations(valid_rows))
 
+    effective_batch = cfg["per_device_batch"] * cfg["grad_accumulation"]
+    total_steps = math.ceil(len(train_rows) / effective_batch) * cfg["epochs"]
+    warmup_steps = math.ceil(cfg["warmup_fraction"] * total_steps)
+
     args = SFTConfig(
         output_dir=str(out_dir / "checkpoints"),
         per_device_train_batch_size=cfg["per_device_batch"],
@@ -134,7 +139,7 @@ def train(out_dir: Path, model_name: str | None = None) -> dict:
         gradient_accumulation_steps=cfg["grad_accumulation"],
         num_train_epochs=cfg["epochs"],
         learning_rate=cfg["learning_rate"],
-        warmup_ratio=cfg["warmup_ratio"],
+        warmup_steps=warmup_steps,
         lr_scheduler_type=cfg["lr_scheduler"],
         fp16=cfg["fp16"],
         bf16=False,
@@ -148,7 +153,7 @@ def train(out_dir: Path, model_name: str | None = None) -> dict:
     )
     trainer = SFTTrainer(
         model=model,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         train_dataset=train_ds,
         eval_dataset=valid_ds,
         args=args,
@@ -175,6 +180,7 @@ def train(out_dir: Path, model_name: str | None = None) -> dict:
         **cfg,
         "train_rows": len(train_rows),
         "valid_rows": len(valid_rows),
+        "warmup_steps": warmup_steps,
         "steps": trainer.state.global_step,
         "final_train_loss": result.training_loss,
         "seconds": round(elapsed),

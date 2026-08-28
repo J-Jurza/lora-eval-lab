@@ -8,6 +8,7 @@ One entry per choice that shapes the result. Git log says what changed; this say
 **Alternatives rejected:** Reporting validation loss or ROUGE as the headline (measures overlap, not quality).
 
 ## 2026-08-28: MTS-Dialog, dialogue to clinical note section
+**Status:** Superseded by "2026-08-28: Pivot to vision" below. The text task continues separately at lower priority.
 **Context:** Need a narrow, public, licence-clean task in the candidate's domain.
 **Decision:** MTS-Dialog (CC BY 4.0), section-level note generation. It is the ambient-scribe problem in miniature.
 **Alternatives rejected:** Generic instruction data (no domain story); synthetic data (evaluation would measure the generator).
@@ -63,3 +64,10 @@ One entry per choice that shapes the result. Git log says what changed; this say
 
 ## 2026-08-28: Colab free tier, Kaggle as the fallback GPU
 **Decision:** Colab T4. If Colab pre-empts twice, the same notebook runs on Kaggle (30 GPU hours a week). Unsloth needs CUDA, so a Mac is not an option for training.
+
+## 2026-08-28: Pivot to vision, NEU surface defects with Qwen2.5-VL-3B-Instruct
+**Status:** Active
+**Context:** A live BHP contract (Data Scientist, Computer Vision / VLM: in-house VLM program for crusher and conveyor image analysis) makes a vision fine-tune the highest-value version of this project this week. Recent industrial-defect literature fine-tunes the Qwen-VL family with LoRA for exactly this task shape.
+**Decision:** Task becomes defect description and classification on the NEU-DET surface-defect dataset (public, small, six defect classes on steel: the industrial-imagery miniature). Model becomes Qwen2.5-VL-3B-Instruct, QLoRA 4-bit on the free Colab T4. Everything else in PROCESS.md holds: base-model generations first, frozen held-out split, blinded side-by-side with A/B swap, judge with the rubric, human blind pass, failure taxonomy, bootstrap CI.
+**Alternatives rejected:** MVTec-AD (licence is CC BY-NC, non-commercial; NEU is cleaner to publish against); PaliGemma-2 (fine, but Qwen-VL is what the defect-detection literature and likely the employer's ecosystem use); staying with the text task this week (serves Heidi, not the live BHP lead).
+**Consequences:** The rubric needs a vision rewrite (faithfulness = does the description match the visible defect; localisation stated coarsely, no bounding-box claim). The judge needs images, so the judge model must be multimodal (Gemini Flash accepts images on the free tier).

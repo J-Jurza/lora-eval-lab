@@ -17,6 +17,10 @@ whose rules live in an Obsidian vault; the ones that bind here:
 - The Colab notebook is for the two GPU steps only (train, generate). Everything else runs
   locally on CPU.
 
+The task pivoted to vision on 28 Aug (see DECISIONS.md): NEU-DET defects, Qwen2.5-VL-3B,
+same evaluation design. A live BHP Computer Vision / VLM contract is the reason; urgency is
+real but the honesty and explain-every-step rules do not relax.
+
 Vault context for the human side of this project:
 `Work/Career/Job Search 2026-08/Strategy/58 - Learning Path (Projects, Courses, Profile Updates).md`
 (Project 1) and `Work/Career/Job Search 2026-08/Strategy/43 - Game Plan (2026-08-26).md` section 6.

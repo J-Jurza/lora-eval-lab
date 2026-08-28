@@ -5,9 +5,10 @@ A small open-weight language model, LoRA fine-tuned on one narrow clinical task,
 [rag-eval-lab](https://github.com/J-Jurza/rag-eval-lab): same organising idea, that the
 evaluation is the deliverable and the model is the excuse to build it.
 
-**Task:** doctor-patient dialogue → clinical note section (the ambient-scribe problem), on
-the public MTS-Dialog dataset (CC BY 4.0, ~1.7k dialogue-note pairs).
-**Model:** a 1B to 4B open-weight instruct model, QLoRA on a free Colab GPU.
+**Task (v2, 28 Aug):** industrial surface-defect description and classification on the public
+NEU-DET steel-defect dataset.
+**Model:** Qwen2.5-VL-3B-Instruct, QLoRA on a free Colab GPU.
+**(v1, the clinical text task on MTS-Dialog, continues separately at lower priority.)**
 **The point:** did the fine-tune actually make the notes *better*, judged the way a
 clinician would judge them, blind, side by side, with a rubric and a failure taxonomy?
 Not "did the loss go down".

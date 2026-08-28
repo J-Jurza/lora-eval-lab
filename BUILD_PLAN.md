@@ -8,7 +8,13 @@ is updated in the same commit.
 Weekend shape: steps 1 to 4 on Saturday (steps 2 to 4 are one Colab session), steps 5 to 7
 on Sunday. Step 8 is optional.
 
-## Rulings needed before step 1
+## Status, 28 August 2026
+
+Steps 0 to 6: code written, tested (38 tests) and committed. Rulings R1 to R3 accepted as
+recommended. Waiting on the GPU session (steps 2 to 4 on Colab) and the Sunday judging.
+Step 7's README skeleton is in place with the results section marked as not yet run.
+
+## Rulings needed before step 1 (resolved, kept for the record)
 
 Three items from the plan review; each becomes a `DECISIONS.md` entry once ruled.
 

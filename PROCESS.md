@@ -46,7 +46,8 @@ against, and "the fine-tuned model produces notes" is not a finding.
   length. Defaults from the Unsloth docs, changed only with a reason written in
   `DECISIONS.md`.
 - Validation loss is watched for overfitting, and that is *all* it is used for.
-- Save the adapter (tens of MB), not the merged model.
+- Save the adapter (tens of MB), not the merged model. The adapter kept is the one from the
+  step where validation loss was lowest.
 
 **You should be able to say:** what LoRA changes and what it leaves alone, why 4-bit, what the
 adapter file is, and roughly how long training took.
@@ -67,16 +68,20 @@ three texts: reference, base output, tuned output.
   state a preference or a tie, with one sentence of reason.
 - Run each pair **twice with A/B swapped** and keep only consistent verdicts; position bias
   is real and this is the cheap control for it.
-- **Human pass:** you judge 30 pairs blind yourself, same rubric, before looking at the
-  judge's answers. Agreement between you and the judge is reported. This is the step that
-  mirrors Heidi's clinician side-by-side, at portfolio scale.
+- **Human pass:** you judge 30 pairs blind yourself, same rubric, before the judge runs.
+  `judge.py --human` writes the pack; you fill a scores line per pair. Raw agreement and
+  Cohen's kappa between you and the judge are reported. This is the step that mirrors
+  Heidi's clinician side-by-side, at portfolio scale.
 
 **You should be able to say:** why blinding, why the swap, why a human subset, and what
 agreement rate you saw.
 
 ## 6. Metrics and the failure write-up (`evaluate.py`)
 
-- Win rate (tuned preferred), tie rate, with a bootstrap 95% confidence interval.
+- Win rate (tuned preferred), tie rate, with a bootstrap 95% confidence interval, over the
+  pairs kept by the swap check. The dropped count is reported, with a sensitivity line that
+  counts dropped pairs as ties.
+- Per-section rates, so History of Present Illness is visible on its own.
 - Per-dimension mean scores, base vs tuned.
 - ROUGE-L as a sanity check only, with the sentence "ROUGE rewards overlap, not
   correctness" next to it.

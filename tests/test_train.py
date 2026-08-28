@@ -46,3 +46,18 @@ def test_log_rows_keeps_loss_entries_only():
         {"step": 25, "epoch": 0.17, "loss": 1.9, "learning_rate": 1e-4},
         {"step": 25, "epoch": 0.17, "eval_loss": 1.7},
     ]
+
+
+class FakeTokenizer:
+    """Renders messages the way a ChatML template would, without a model download."""
+
+    def apply_chat_template(self, messages, tokenize=False, add_generation_prompt=False):
+        return "".join(f"<|im_start|>{m['role']}\n{m['content']}<|im_end|>\n" for m in messages)
+
+
+def test_to_text_renders_all_three_turns_with_markers():
+    rows = [{"id": "train:0", "section": "CC", "dialogue": "Doctor: hi.", "note": "Headache."}]
+    text = train.to_text(rows, FakeTokenizer())[0]["text"]
+    assert text.count("<|im_start|>") == 3
+    assert train.QWEN_USER_MARK in text and train.QWEN_ASSISTANT_MARK in text
+    assert text.rstrip().endswith("Headache.<|im_end|>")

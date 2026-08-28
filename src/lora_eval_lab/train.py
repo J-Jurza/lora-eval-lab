@@ -66,6 +66,23 @@ def to_conversations(rows: list[dict]) -> list[dict]:
     return [{"messages": data.format_example(r, with_answer=True)} for r in rows]
 
 
+def to_text(rows: list[dict], tokenizer) -> list[dict]:
+    """
+    Render rows to chat-template text, the shape Unsloth's trainer expects.
+
+    Args:
+        rows (list[dict]): Rows from data.load_split.
+        tokenizer: A tokenizer with apply_chat_template.
+
+    Returns:
+        list[dict]: One {"text": rendered chat} per row, answer turn included.
+    """
+    return [
+        {"text": tokenizer.apply_chat_template(r["messages"], tokenize=False, add_generation_prompt=False)}
+        for r in to_conversations(rows)
+    ]
+
+
 def log_rows(log_history: list[dict]) -> list[dict]:
     """
     Keep the loss entries from a trainer's log history.
@@ -127,8 +144,8 @@ def train(out_dir: Path, model_name: str | None = None) -> dict:
     )
 
     train_rows, valid_rows = data.training_rows()
-    train_ds = Dataset.from_list(to_conversations(train_rows))
-    valid_ds = Dataset.from_list(to_conversations(valid_rows))
+    train_ds = Dataset.from_list(to_text(train_rows, tokenizer))
+    valid_ds = Dataset.from_list(to_text(valid_rows, tokenizer))
 
     effective_batch = cfg["per_device_batch"] * cfg["grad_accumulation"]
     total_steps = math.ceil(len(train_rows) / effective_batch) * cfg["epochs"]
@@ -155,6 +172,7 @@ def train(out_dir: Path, model_name: str | None = None) -> dict:
         metric_for_best_model="eval_loss",
         greater_is_better=False,
         max_length=cfg["max_seq_length"],
+        dataset_text_field="text",
         eos_token=tokenizer.eos_token,
         seed=cfg["seed"],
         report_to="none",

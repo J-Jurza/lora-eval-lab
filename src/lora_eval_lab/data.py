@@ -233,6 +233,21 @@ def load_holdout_ids(path: Path = HOLDOUT_PATH) -> list[str]:
     return json.loads(path.read_text())["kept"]
 
 
+def heldout_rows(raw_dir: Path = RAW_DIR, path: Path = HOLDOUT_PATH) -> list[dict]:
+    """
+    Load the held-out rows in frozen-id order.
+
+    Args:
+        raw_dir (Path): Directory holding the CSVs.
+        path (Path): The frozen ids file.
+
+    Returns:
+        list[dict]: One row per kept id.
+    """
+    by_id = {r["id"]: r for r in load_split(HELDOUT_SPLIT, raw_dir)}
+    return [by_id[i] for i in load_holdout_ids(path)]
+
+
 def training_rows(raw_dir: Path = RAW_DIR) -> tuple[list[dict], list[dict]]:
     """
     Load train and validation rows, dropping validation rows that duplicate train.

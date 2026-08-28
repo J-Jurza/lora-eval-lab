@@ -16,6 +16,10 @@ import urllib.request
 from collections import Counter
 from pathlib import Path
 
+# ----------------------------------------------------------------------------
+# Paths and source pin
+# ----------------------------------------------------------------------------
+
 ROOT = Path(__file__).resolve().parents[2]
 RAW_DIR = ROOT / "data" / "raw"
 HOLDOUT_PATH = ROOT / "eval" / "holdout_ids.json"
@@ -34,6 +38,10 @@ CHECKSUMS = {
     "test1": "b4d38dd2c99b2e9860099abcf653f1e0f3e9b69f9fcc45be2a2699b37a4d2f37",
 }
 HELDOUT_SPLIT = "test1"
+
+# ----------------------------------------------------------------------------
+# Section names and prompt template
+# ----------------------------------------------------------------------------
 
 # The dataset's 20 section codes and what a clinician calls them
 SECTION_NAMES = {
@@ -67,6 +75,10 @@ SYSTEM_PROMPT = (
 )
 USER_TEMPLATE = "Section to write: {section}\n\nConversation:\n{dialogue}"
 
+
+# ----------------------------------------------------------------------------
+# Fetch and load
+# ----------------------------------------------------------------------------
 
 def row_id(split: str, raw_id: str) -> str:
     """
@@ -133,6 +145,10 @@ def load_split(split: str, raw_dir: Path = RAW_DIR) -> list[dict]:
     return out
 
 
+# ----------------------------------------------------------------------------
+# Leakage check
+# ----------------------------------------------------------------------------
+
 def normalise(text: str) -> str:
     """Collapse whitespace and case so a re-pasted dialogue still matches."""
     return " ".join(text.lower().split())
@@ -152,6 +168,10 @@ def cross_split_duplicates(reference: list[dict], other: list[dict]) -> list[str
     seen = {normalise(r["dialogue"]) for r in reference}
     return [r["id"] for r in other if normalise(r["dialogue"]) in seen]
 
+
+# ----------------------------------------------------------------------------
+# Chat formatting
+# ----------------------------------------------------------------------------
 
 def format_example(row: dict, with_answer: bool = True) -> list[dict]:
     """
@@ -174,6 +194,10 @@ def format_example(row: dict, with_answer: bool = True) -> list[dict]:
         messages.append({"role": "assistant", "content": row["note"]})
     return messages
 
+
+# ----------------------------------------------------------------------------
+# Held-out freeze and split helpers
+# ----------------------------------------------------------------------------
 
 def build_holdout(raw_dir: Path = RAW_DIR, path: Path = HOLDOUT_PATH) -> dict:
     """
@@ -224,6 +248,10 @@ def training_rows(raw_dir: Path = RAW_DIR) -> tuple[list[dict], list[dict]]:
     dup = set(cross_split_duplicates(train, valid))
     return train, [r for r in valid if r["id"] not in dup]
 
+
+# ----------------------------------------------------------------------------
+# Stats and CLI
+# ----------------------------------------------------------------------------
 
 def _quantile(values: list[int], p: float) -> int:
     """Nearest-rank quantile of a sorted list."""

@@ -5,6 +5,10 @@ import json
 from lora_eval_lab import data
 
 
+# ----------------------------------------------------------------------------
+# Fixtures
+# ----------------------------------------------------------------------------
+
 def row(id_, section, dialogue, note="A note."):
     """Build a minimal row dict in the shape load_split returns."""
     return {"id": id_, "section": section, "dialogue": dialogue, "note": note}
@@ -18,6 +22,10 @@ def write_csv(path, rows):
         writer.writeheader()
         writer.writerows(rows)
 
+
+# ----------------------------------------------------------------------------
+# Ids, normalisation, duplicate rule
+# ----------------------------------------------------------------------------
 
 def test_row_id_carries_split_name():
     assert data.row_id("test1", "0") == "test1:0"
@@ -40,6 +48,10 @@ def test_cross_split_duplicates_catches_planted_duplicate_only():
     assert data.cross_split_duplicates(train, other) == ["test1:0"]
 
 
+# ----------------------------------------------------------------------------
+# Chat formatting
+# ----------------------------------------------------------------------------
+
 def test_format_example_uses_full_section_name_and_dialogue():
     r = row("train:7", "GENHX", "Doctor: how long?\nPatient: two days.", "Symptoms for two days.")
     msgs = data.format_example(r)
@@ -58,6 +70,10 @@ def test_format_example_prompt_only_has_no_answer():
     assert [m["role"] for m in msgs] == ["system", "user"]
     assert "NKDA" not in json.dumps(msgs)
 
+
+# ----------------------------------------------------------------------------
+# Held-out freeze
+# ----------------------------------------------------------------------------
 
 def test_every_section_code_has_a_name():
     assert len(data.SECTION_NAMES) == 20

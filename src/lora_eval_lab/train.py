@@ -99,10 +99,12 @@ def train(out_dir: Path, model_name: str | None = None) -> dict:
     Returns:
         dict: The config actually used, plus timing and step counts.
     """
-    from datasets import Dataset
-    from trl import SFTConfig, SFTTrainer
+    # Unsloth must be imported before trl and transformers so its patches apply
     from unsloth import FastLanguageModel
     from unsloth.chat_templates import train_on_responses_only
+
+    from datasets import Dataset
+    from trl import SFTConfig, SFTTrainer
 
     cfg = dict(CONFIG)
     if model_name:
@@ -153,6 +155,7 @@ def train(out_dir: Path, model_name: str | None = None) -> dict:
         metric_for_best_model="eval_loss",
         greater_is_better=False,
         max_length=cfg["max_seq_length"],
+        eos_token=tokenizer.eos_token,
         seed=cfg["seed"],
         report_to="none",
     )

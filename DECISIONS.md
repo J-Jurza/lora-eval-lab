@@ -97,3 +97,8 @@ One entry per choice that shapes the result. Git log says what changed; this say
 **Context:** The free-tier Flash model assumed when the judge was written (gemini-2.5-flash) is closed to new API keys; the API itself recommended gemini-3.6-flash. The key can also reach gemini-3.5-flash-lite.
 **Decision:** Pin `gemini-3.6-flash` as the judge and record it on every verdict row; `gemini-3.5-flash-lite` is the quota fallback named in the earlier entry. A dated version name rather than `gemini-flash-latest`, so a rerun next year judges with the same model or fails loudly.
 **Alternatives rejected:** `gemini-flash-latest` (silently changes the judge over time).
+
+## 2026-08-29: Judge runs on prepaid Gemini credit, not a free tier
+**Context:** Every Flash model on a fresh API key returned "prepayment credits are depleted"; Google no longer attaches free quota to new keys. The earlier entry's fallback chain (Flash-Lite, then a subset) does not help when the whole key has no quota.
+**Decision:** AUD 25 of prepaid credit added by the owner. The full run is about 388 calls of roughly 1,500 input and 150 output tokens, well under one dollar at Flash pricing; the README states the cost. Supersedes the "free tier" wording in the two judge entries above.
+**Alternatives rejected:** Claude as judge (equally paid, and it would break family-independence continuity with rag-eval-lab); a smaller judged subset to fit a free tier that does not exist.

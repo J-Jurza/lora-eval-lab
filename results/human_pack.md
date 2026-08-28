@@ -1,5 +1,12 @@
 # Human blind pass
 
+**Corrections log (2026-08-29, before any judge verdict existed).** Three SCORES lines were
+clerical slips against the reason written at the time and were corrected by the owner; no
+judgement was changed: `test1:4` scores typed without spaces (5555 / 5545); `test1:7` B scores
+typed as "12 3 4 4", corrected to 2 3 4 4; `test1:69` preference written as "Neither, same",
+corrected to tie; `test1:172` preference typed as B where the reason says A. `test1:108` B
+faithfulness corrected from 2 to 5 to match the reason.
+
 Score each side 1 to 5 per dimension, then a preference, before running the judge.
 Fill the SCORES line exactly: `SCORES: A f c fo co | B f c fo co | PREF: A|B|tie | REASON: ...`
 
@@ -9,19 +16,17 @@ Score each output 1 to 5 on each dimension, then state a preference (A, B, or ti
 sentence. Judge the note against the **dialogue**, not against the reference; the reference
 is shown only to calibrate format and expected level of detail.
 
-| Dimension | 5 | 1 |
-|---|---|---|
-| **Faithfulness** | Every fact in the note is stated or clearly implied in the dialogue | Contains a fact the dialogue does not support |
-| **Completeness** | Every clinically relevant fact in the dialogue for this section is captured | Major omissions |
-| **Format** | Reads as the requested section of a clinical note | Wrong section, chatty, or not a note |
-| **Concision** | No padding, no repetition | Verbose or repetitive |
+| Dimension              | 5                                                                           | 1                                             |
+| ---------------------- | --------------------------------------------------------------------------- | --------------------------------------------- |
+| **Faithfulness** | Every fact in the note is stated or clearly implied in the dialogue         | Contains a fact the dialogue does not support |
+| **Completeness** | Every clinically relevant fact in the dialogue for this section is captured | Major omissions                               |
+| **Format**       | Reads as the requested section of a clinical note                           | Wrong section, chatty, or not a note          |
+| **Concision**    | No padding, no repetition                                                   | Verbose or repetitive                         |
 
 Faithfulness outranks everything: a shorter note with no invented facts beats a fuller note
 with one. A tie is a legitimate verdict.
 
-
 ---
-
 
 ## Pair test1:4
 
@@ -56,8 +61,7 @@ Family and Social History:
 Father died of thoracic aortic aneurysm at the age of 71. Mother died of stroke at the age of 81.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 5 5 | B 5 5 4 5 | PREF: A | REASON: A is better based on format as it slightly more context in A about the fact that it is family and social history.
 
 ## Pair test1:7
 
@@ -99,8 +103,7 @@ Family and Social History:
 Mother's father had colon cancer at age 73.  Mother's brother was recently diagnosed with leukemia at age 50.  Mother's father had bone cancer at age 80.  Mother's grandmother had deep vein thrombosis in her leg in her 40s.  Mother has two half-brothers who are in good health.  Mother has an aunt on her paternal side of the family who has diabetes.  Mother has cousins on her maternal side of the family who have diabetes.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 1 3 5 5 | B 2 3 4 4 | PREF: B | REASON: Both have an incorrect fact the dialogue does not support,  in that A states that "`No known health conditions in the patient's family`" and B states incorrectly that the halfbrothers belong to the patients mother, not th patient. This is wrong as it then states multiple conditions in the family outside parents and half brothers. Aso states that the father gt colon cncer at age 73, that is actually his age, he got it when he was 68. This is an omission of the actual age of cancer. While both incorrect, A has more incorrect facts, but is formatted better. The more incorrect facts get penalised stronger.
 
 ## Pair test1:8
 
@@ -141,8 +144,7 @@ Family and Social History:
 He is retired.  He is a social worker.  He is a smoker.  He is a social drinker.  He denies any illicit drug use.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 3 5 5 | B 1 2 4 5 | PREF: A | REASON: Mainly due to failthfulness, B contains majorly incorrect facts, like being a amoker, and social worker (acutally works in social security administration)). Both contain omissions.
 
 ## Pair test1:10
 
@@ -183,8 +185,7 @@ The patient is an African American woman seventy-nine years old, five foot three
 This 79-year-old African American female presents to the office for a routine checkup.  She is a 5'3" tall and weighs 197 pounds.  She has a history of type II diabetes mellitus since 1983.  She has no known drug allergies.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 4 5 | B 5 5 4 4 | PREF: A | REASON: A is only slightly better as B is a little more verbose.
 
 ## Pair test1:14
 
@@ -221,8 +222,7 @@ The patient denies any alcohol use.  The patient denies any tobacco use.
 Patient: I do not smoke.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 4 5 | B 5 4 4 5 | PREF: A | REASON: A is slightly better as if captures the patient not drinking. just depends on whether this is considered an illness, so it may be irrelevant.
 
 ## Pair test1:16
 
@@ -257,8 +257,7 @@ Physical Examination: The patient's skin is noted to be turning blue or greyish 
 EXT: No cyanosis, no edema, no swelling.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 1 5 5 5 | B 5 5 5 5 | PREF: B | REASON: A contains a major incorrect fact, claiming that the petient did present with cyanosis, when they said 'not that i know of' with respec tot he cyanosis.
 
 ## Pair test1:17
 
@@ -291,8 +290,7 @@ No prior surgeries.
 None.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 5 5 | B 5 5 4 5 | PREF: A | REASON: A is slightly better as it is specific that it is about surgeries, while the 'None' in B is too vague.
 
 ## Pair test1:23
 
@@ -330,8 +328,7 @@ No known allergies.  No smoking or alcohol.  No previous medical problems.  No s
 Allergies: No known allergies.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 3 4 | B 5 5 5 5 | PREF: B | REASON: B is better due to format and conciseness as it has lonly refers to allergies, while A has a lot of info irrelevant to allergies.
 
 ## Pair test1:37
 
@@ -371,8 +368,7 @@ Family and Social History:
 The patient is a smoker, has been smoking one pack per day for 15 years.  He is an addict and takes oxy and a few other narcotics from the street.  He drinks a lot.  He needs help.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 5 5 | B 5 5 4 3 | PREF: A | REASON: A is better due to formatting and conciseness, B is more verbose and contains slightly irrelevant facts.
 
 ## Pair test1:38
 
@@ -427,8 +423,7 @@ Patient: Yes, I have had three Synvisc injections, and the last one was about fi
 The patient is a 50-year-old white female who presents today for a 36th birthday.  She has had three Synvisc injections, the last one being about 5 days prior to her birthday.  She states that she has had some improvement, but she still has some pinching pain in her left knee.  She states that she is unable to put full weight on her left knee.  She states that when she does put weight on her left knee, she has some pain.  She states that she is unable to bend her left knee.  She states that she is unable to straighten her left knee.  She states that she has a pain rating of 10/10.  She states that she uses ice and heat.  She states that she is taking Tylenol with codeine and some ibuprofen.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 3 3 3 3 | B 3 4 3 2 | PREF: A | REASON: B is slightly better based on completeness, as it captures more of the illness history than A. Both have incorrectly stated facts .
 
 ## Pair test1:42
 
@@ -469,8 +464,7 @@ Patient: I am sixty eight years old.
 The patient is a 68-year-old male who presents to the emergency room with a three-day history of productive cough and sputum production.  He denies any fever, chills, or shortness of breath.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 1 1 5 | B 5 5 4 5 | PREF: B | REASON: B is the better response baed ont he completeness dimension, as A omits the entire illness history while B captures the whole history.
 
 ## Pair test1:43
 
@@ -502,8 +496,7 @@ None.
 Assessment: No intra-abdominal pathology noted.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 2 3 5 | B 5 4 5 5 | PREF: B | REASON: B is better based on completeness as it is more specific, while A is vague when it says 'None' without saying what it is referring to.
 
 ## Pair test1:44
 
@@ -538,8 +531,7 @@ Significant for obesity, hypertension, and a history of deep vein thrombosis and
 Obesity, hypertension, history of knee fracture with internal fixation (pin) in 1999, history of blood clots.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 1 4 5 5| B 2 5 5 5 | PREF: B | REASON: B is slightly better on faithfulness regarding past medical history, even though it incorrectly states the year as 1999, A mentiones DVT which appedars nowhere in the text, it has mistaken general blood clots for DVT. The clinical info of B is slightly more faithful and it mentions more abou the knee pin.
 
 ## Pair test1:67
 
@@ -588,8 +580,7 @@ History of Present Illness:
 The patient reports a long-standing on and off lower back pain on the right side, which started after a motor vehicle accident in September 2005. The pain initially occurred five days after the accident, with the location initially being the lower back, then moving to the buttocks, posterior thigh, and outside of the calf. The pain is exacerbated by prolonged sitting or walking and relieved by lying down or standing. There is no reported weakness in the left leg or any change in bowel or urinary function. The symptoms have increased gradually over time, with the patient having used pain medication and a corticosteroid injection four and a half weeks ago. The patient is able to raise their leg straight up.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 2 4 4 5 | B 5 5 5 5 | PREF: B  | REASON: B is better on faithfulness as A incorrectly sttes the patient is male when this is not in the conversation.
 
 ## Pair test1:69
 
@@ -622,8 +613,7 @@ None.
 None
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 4 4 5 | B 5 4 4 5 | PREF: tie | REASON: Neither, both are the same A and B and both correct if a little too concise.
 
 ## Pair test1:83
 
@@ -657,8 +647,7 @@ Review of Systems:
 Review of systems is otherwise noncontributory.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 5 5 | B 5 3 5 5 | PREF: A | REASON: A is better on completeness as it actually captures the symptoms / systems while B omits them.
 
 ## Pair test1:84
 
@@ -691,8 +680,7 @@ The patient reports feeling much better after the Prednisone, with the redness a
 1.  Prednisone. 2.  Redness and swelling.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 4 4 | B 2 2 2 5 | PREF: A | REASON: A is better on faithfulness and completeness as it correctly states all the facts hwile B suggests there is redness and swelling but this has subsided so it is incorrect.
 
 ## Pair test1:89
 
@@ -737,8 +725,7 @@ He is a disabled gentleman who does not smoke or drink.  He is dating a girlfrie
 Marital Status: Married. Living together. Activity Level: Minimal. Last Drug Test: Not applicable.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 4 5 3 | B 1 3 4 5 | PREF: A | REASON: A is better on faithfulness as it does not make any incorrext claims or miss any details whereas B incorrectly claims patient is married and omits that patient does not smoke or drink.
 
 ## Pair test1:108
 
@@ -774,8 +761,7 @@ Ongoing purulent rhinitis.  Probable sinusitis and serous otitis.
 Assessment: The patient is experiencing symptoms of sinusitis, including green snot and ear pain. There is fluid buildup in the right middle ear. The patient is prescribed antibiotics and should return for a follow-up to ensure the fluid is cleared.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 2 4 5 | B 5 5 5 3 | PREF: B | REASON: B is better on faithfulness and completeness as A mentions an ear infection which is not mentioned int he conversation, and it also omits a lot of details like the green snot and ear pain, fluid buildup and the prescription and follow up request.
 
 ## Pair test1:115
 
@@ -808,8 +794,7 @@ Chief Complaint: Joint pain, with the onset of symptoms being a couple weeks ago
 Joint pain.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 5 5 | B 5 2 3 5 | PREF: A | REASON: A is better on completeness, and B omits the onset being a couple of weeks and that it is affecting multiple joints.
 
 ## Pair test1:127
 
@@ -843,8 +828,7 @@ Patient: I feel better now.
 The patient is in stable condition.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 4 4 4 | B 2 4 4 4 | PREF: A | REASON: A is slightly better on faithfulness. illness is not mentined but the patient feeling better is a more accurate description than the patient being in a stable condition.
 
 ## Pair test1:134
 
@@ -883,8 +867,7 @@ Medications: None noted.
 None.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 3 2 4 5 | B 3 2 3 5 | PREF: A | REASON: A is slightly better on formatting but both fail to state that the patient is not on blood thinners. the description does not mention what medications patient is on but it implies the patient is.
 
 ## Pair test1:146
 
@@ -928,8 +911,7 @@ The patient sustained a fracture of both the bones in his forearm in September 2
 The patient is a 5-year-old male who was seen in the emergency room in September 2007 for a closed fracture of the left forearm.  The patient was treated with closed reduction and cast.  The patient was seen in the emergency room again in October 2007 for a closed fracture of the left forearm.  The patient was treated with closed reduction and cast.  The patient was seen in the emergency room again in November 2007 for a closed fracture of the left forearm.  The patient was treated with closed reduction and cast.  The patient was seen in the emergency room again in December 2007 for a closed fracture of the left forearm.  The patient was treated with closed reduction and cast.  The patient was seen in the emergency room again in January 2008 for a closed fracture of the left forearm.  The patient was treated with closed reduction and cast.  The patient was seen in the emergency room again in February 2008 for a closed fracture of the left forearm.  The patient was treated with closed reduction and cast.  The patient was seen in the emergency room again in March 2008 for a closed fracture of the left forearm.  The patient was treated with closed reduction and cast.  The patient was seen in the emergency room again in April 2008 for a closed fracture of the left forearm.  The patient was treated with closed reduction and cast.  The patient was seen in the emergency room again in May 2008 for
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 4 3 | B 1 3 4 3  | PREF: A | REASON: A is better on faithfulness, as B makes claims that are not in the conversatino like closed reduction, left arm (not in the convo) and mentions emergency.
 
 ## Pair test1:149
 
@@ -969,8 +951,7 @@ Family and Social History:
 Mother died of stroke in her 50s.  Father had some heart issues and had hypertension.  He died in his 70s.  He was a heavy smoker, used to smoke 2-3 packs per day.  He was a feed salesman.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 3 5 5 | B 1 4 4 4 | PREF: A | REASON: A is better on faithfulness as B has incorrect claims like father died in 70s (not metnione din conversation) and it assumes the paitient is male twhen this is not impled inthe conversation. A has some slight details missing like how many packs per day but it captures the gist much better than B.
 
 ## Pair test1:156
 
@@ -1003,8 +984,7 @@ No known past surgical history.
 None
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 5 5 | B 5 4 5 5 | PREF: A | REASON: A is slightly better as it is a little more specific about it beign surgety. B is more vague.
 
 ## Pair test1:158
 
@@ -1039,8 +1019,7 @@ Imaging: X-ray of the shoulder shows two views. No bone abnormalities or degener
 Shoulder x-ray.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 5 5 | B 5 1 3 5 | PREF: A | REASON: A is better based onthe omisson dimension as B omits the details of `"I am not seeing any bone abnormalities or any degenerative changes`"
 
 ## Pair test1:172
 
@@ -1076,8 +1055,7 @@ The patient has traveled to more than six countries and plans to travel again in
 She has travelled to more than six countries.  She has not travelled outside the country recently.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 3 5 5 | B 2 4 4 5 | PREF: A | REASON: A is better, by faithfulness and formatting is slightly better.  both have similr omissions, but B assumes patient is female when this is not implied in the conversation.
 
 ## Pair test1:173
 
@@ -1118,8 +1096,7 @@ Review of Systems:
 Bowel/bladder, no dysuria or hematuria.  No chest pain.  No shortness of breath.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 5 5| B 4 3 3 5| PREF: A | REASON: A is better on the omission dimension and formatting dimension. B doesn's say if there are any bladder/bowel issues, just says bladder/bowel. The formatting of A is more clear also, and it is a perfect response.
 
 ## Pair test1:189
 
@@ -1152,8 +1129,7 @@ Medications: Synthroid for thyroid, Aspirin (stopped about a week ago), Terazosi
 Synthroid, Aspirin, Terazosin, Lisinopril, and Atenolol.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
-
+SCORES: A 5 5 5 5 | B 3 2 4 5 | PREF: A | REASON: A is clearly better  on the faithfulness and omission dimensions as it mentions when the medications were discontinued, whereas B just lists them, correctly, but doesnt say when  the aspiron and `Terazosin, Lisinopril, and Atenolol` were discontinued, which could imply th patient is still on them, which is not correct.
 
 ## Pair test1:192
 
@@ -1190,4 +1166,4 @@ Assessment: The patient has been in good spirits and has high energy levels. She
 1.  The patient is in good spirits. 2.  The patient has had some constipation issues. 3.  The patient's breathing is unchanged. 4.  The patient has not gained any weight since her last visit. 5.  The patient's energy level is high.
 ```
 
-SCORES: A _ _ _ _ | B _ _ _ _ | PREF: _ | REASON: 
+SCORES: A 5 5 5 5 | B 5 3 5 4| PREF: A  | REASON: A is slightly betteron completeness asn B omits the doctor recommendation on making sure patient has sufficient protein ans meal timing. The formatting and conciseness of A is a little better as well.

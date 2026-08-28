@@ -29,11 +29,63 @@ flowchart LR
 
 ## Results
 
-**Not yet run.** The GPU steps run on the weekend of 30 to 31 August 2026; this section is
-filled in from `results/metrics.md` afterwards, with the interval, the tie and dropped
-counts, the per-dimension and per-section tables, the human-judge agreement, and the
-failure taxonomy over every loss. If the tuned model is at parity or worse, that is what
-this section will say.
+Run on 29 to 30 August 2026. 194 held-out pairs judged twice each with A/B swapped; 171 kept
+after the swap check. Full tables in `results/metrics.md`.
+
+**The base model wins.** The tuned model was preferred in **33.9%** of kept pairs (95% CI
+26.9 to 40.9), the base model in 51.5%, tie 14.6%. The interval excludes 50%, so this is
+not parity: fine-tuning made the notes worse as judged blind against the rubric. Counting
+the 23 dropped pairs as ties: tuned 29.9%, base 45.4%.
+
+**What got worse, and what did not:**
+
+| Dimension (1 to 5) | Base | Tuned | Difference | 95% CI |
+|---|---|---|---|---|
+| Faithfulness | 4.42 | 4.05 | **-0.37** | -0.63 to -0.11 |
+| Completeness | 4.25 | 4.01 | -0.23 | -0.45 to 0.00 |
+| Format | 4.51 | 4.42 | -0.09 | -0.29 to +0.11 |
+| Concision | 4.45 | 4.37 | -0.08 | -0.27 to +0.11 |
+
+Faithfulness is the loss. Format, the thing fine-tuning was expected to fix, did not move
+within its interval, because the base model already writes an acceptable note section
+zero-shot and the tuned model learned the dataset's terse style at the cost of inventing
+specifics the patient never said.
+
+**ROUGE-L went the other way**: 0.183 base, 0.282 tuned. Overlap with the reference rose
+by half while blind preference fell. This is the clearest illustration in the repo of why
+ROUGE is a sanity check and not a result: the reference notes contain ages and dates the
+dialogues do not, and the tuned model learned to produce text of that shape.
+
+**Where:** History of Present Illness, the ambient-scribe section, 44 kept pairs: tuned
+0.41 (CI 0.27 to 0.55), base 0.55, tie 0.05. Past Medical History is the one section the
+tuned model won (9 of 13). Allergies and Past Surgical History were mostly ties, as they
+should be when both models write "No known drug allergies". Sections with fewer than 10
+pairs are listed in `results/metrics.md` and not interpreted.
+
+**The judge, checked:**
+
+- Position bias was real and one-directional: all 23 dropped pairs involved preferring the
+  left-hand candidate (11 chose A in both orderings, 12 chose A once and tie once). The
+  judge never flipped to B.
+- Human pass, 30 pairs scored blind before the judge ran: the author preferred the base
+  model in 22, the tuned model in 7, one tie. On the 29 pairs both rated and kept, raw
+  agreement with the judge 0.69, Cohen's kappa 0.41 (moderate). Disagreements were mostly
+  the judge calling a tie where the author had a preference.
+- Two tuned outputs state a patient's exact age that appears in the reference note and
+  nowhere in the dialogue; the judge scored both faithfulness 5. It did not catch them.
+
+**Failure taxonomy over the 88 losses:** pending the author's hand labels in
+`results/losses.md`; this table is filled in when they exist. From the judge's reasons,
+two mechanisms are already visible: unsupported specifics (ages, dates, values) and
+repetition loops (6 tuned outputs degenerate into repeated phrases; 4 of them lost).
+
+**What this does and does not show.** It shows that 1,200 examples of QLoRA on this dataset
+made a 1.5B instruct model less faithful to the conversation, as judged blind by one LLM
+judge and one human with a written rubric. It does not show that fine-tuning is the wrong
+tool for the task: no hyperparameter search, no preference stage after SFT, one judge, one
+human who is not a clinician, and a dataset whose reference notes carry facts the dialogues
+lack, so the model was partly trained to invent. A prompted base model was the harder
+opponent than expected, and that is the finding worth carrying to the next attempt.
 
 ## What gets measured
 
@@ -85,6 +137,7 @@ The full record, with alternatives rejected, is `DECISIONS.md`.
 | Human blind pass before the judge runs | Independence of the human scores | 30 pairs is a time budget |
 | Metrics hand-rolled with hand-computed tests | The arithmetic is the deliverable and must be checkable | Slower than a library; no community review |
 | Adapter on Drive, not committed | Tens of MB of binary in a docs repo | A clone cannot regenerate tuned outputs without it |
+| Judge on prepaid Gemini credit, gemini-3.6-flash pinned | New API keys carry no free quota; the run cost under one dollar | The "free tier" plan in early DECISIONS entries did not survive contact |
 
 ## What the metrics do not catch
 

@@ -102,3 +102,6 @@ One entry per choice that shapes the result. Git log says what changed; this say
 **Context:** Every Flash model on a fresh API key returned "prepayment credits are depleted"; Google no longer attaches free quota to new keys. The earlier entry's fallback chain (Flash-Lite, then a subset) does not help when the whole key has no quota.
 **Decision:** AUD 25 of prepaid credit added by the owner. The full run is about 388 calls of roughly 1,500 input and 150 output tokens, well under one dollar at Flash pricing; the README states the cost. Supersedes the "free tier" wording in the two judge entries above.
 **Alternatives rejected:** Claude as judge (equally paid, and it would break family-independence continuity with rag-eval-lab); a smaller judged subset to fit a free tier that does not exist.
+
+## 2026-08-30: Correction to the memorised-specifics count
+**What happened:** The 2026-08-28 entry reported 7 held-out rows where the tuned model states an age absent from the dialogue. That check only tested the first number-word found in the dialogue; a stricter check (any number-word whose tens digit matches) finds 2 such rows. The judge scored both faithfulness 5, so it did not catch them either. The earlier entry stands as written; this one supersedes its count.

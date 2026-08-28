@@ -96,6 +96,8 @@ agreement rate you saw.
 
 ## 7. Write it up
 
+What happened (29 to 30 August 2026): the base model won, 51.5% to 33.9% with 14.6% ties, and faithfulness was the dimension that fell. The README leads with that.
+
 README gets the numbers, the interval, the failure table and the honest sentence about
 what the result does and does not show. If the tuned model is at parity or worse, that is
 the write-up. A negative result with a clean method is a better portfolio piece than an

@@ -8,11 +8,13 @@ is updated in the same commit.
 Weekend shape: steps 1 to 4 on Saturday (steps 2 to 4 are one Colab session), steps 5 to 7
 on Sunday. Step 8 is optional.
 
-## Status, 28 August 2026
+## Status, 30 August 2026
 
-Steps 0 to 6: code written, tested (38 tests) and committed. Rulings R1 to R3 accepted as
-recommended. Waiting on the GPU session (steps 2 to 4 on Colab) and the Sunday judging.
-Step 7's README skeleton is in place with the results section marked as not yet run.
+Steps 0 to 6 done and committed: GPU session run 28 August (base generations, 15-minute
+train, tuned generations), human pass 29 August, judge run 30 August (388 verdicts),
+metrics computed. Result: base model preferred, 51.5% to 33.9%. Step 6's failure taxonomy
+awaits the owner's labels in `results/losses.md`; step 7's README results section is
+written with the taxonomy table marked pending. Step 8 (one-shot base) not run.
 
 ## Rulings needed before step 1 (resolved, kept for the record)
 

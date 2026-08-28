@@ -17,7 +17,7 @@ rubric and a failure taxonomy? Not "did the loss go down".
 
 ```mermaid
 flowchart LR
-    D[MTS-Dialog, pinned commit] -->|data.py: official split, duplicate check| S[train 1,201 / valid 98 / held-out 199]
+    D[MTS-Dialog, pinned commit] -->|data.py: official split, duplicate check| S[train 1,201 / valid 98 / held-out 194]
     S -->|generate.py, greedy| B[base outputs]
     S -->|train.py: QLoRA r=16, 2 epochs| A[adapter, ~70 MB]
     A -->|generate.py, same prompt| T[tuned outputs]
@@ -77,7 +77,7 @@ The full record, with alternatives rejected, is `DECISIONS.md`.
 
 | Decision | Why | Trade-off accepted |
 |---|---|---|
-| Official MTS-Dialog split, duplicate check across splits, held-out ids frozen in the repo | Leakage is the commonest silent error; one test row was a word-for-word copy of a training dialogue | 199 held-out pairs, not 200 |
+| Official MTS-Dialog split, duplicate checks on dialogue text and on note text, held-out ids frozen in the repo | Leakage is the commonest silent error; one test dialogue was a copy of a training dialogue, and five test notes came from encounters also in training (found after training, recorded) | 194 held-out pairs, not 200 |
 | Train on all 20 section types, report HPI separately | 1,201 rows beat 282; the section header conditions the model | Headline mixes one-line and paragraph sections |
 | Zero-shot base as the control | The written process says so; a prompted base is an optional second column | A bare prompt is a weak opponent |
 | Greedy decoding, identical for both models | Repeatable generations; committed outputs can be checked | Greedy can be blunt; both models pay equally |

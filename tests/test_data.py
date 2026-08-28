@@ -79,6 +79,26 @@ def test_every_section_code_has_a_name():
     assert len(data.SECTION_NAMES) == 20
 
 
+def test_note_duplicates_drop_long_matches_and_keep_boilerplate():
+    long_note = "The patient is a 49-year-old white female established patient to dermatology last seen in June."
+    train = [
+        row("train:0", "GENHX", "Doctor: A?", long_note),
+        row("train:1", "ALLERGY", "Doctor: B?", "No known drug allergies."),
+        row("train:2", "GENHX", "Doctor: C?", "Completely different history about a knee injury last winter skiing."),
+    ]
+    other = [
+        row("test1:0", "GENHX", "Doctor: other words.", long_note.upper()),           # exact after normalising
+        row("test1:1", "ALLERGY", "Doctor: allergies?", "No known drug allergies."),   # boilerplate, kept
+        row("test1:2", "GENHX", "Doctor: new.", long_note.replace("June", "July")),    # near duplicate
+        row("test1:3", "GENHX", "Doctor: new.", "An unrelated note about chest pain for three days."),
+    ]
+    dropped, boilerplate = data.cross_split_note_duplicates(train, other)
+    assert [d["id"] for d in dropped] == ["test1:0", "test1:2"]
+    assert dropped[0]["kind"] == "exact" and dropped[0]["matches"] == "train:0"
+    assert dropped[1]["kind"].startswith("near")
+    assert boilerplate == ["test1:1"]
+
+
 def test_build_holdout_drops_train_duplicates(tmp_path):
     write_csv(
         tmp_path / data.FILES["train"],

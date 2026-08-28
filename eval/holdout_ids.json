@@ -3,7 +3,7 @@
  "commit": "3ff0801933608d6f570468c13125125fb5cabdea",
  "licence": "CC BY 4.0",
  "split_file": "MTS-Dialog-TestSet-1-MEDIQA-Chat-2023.csv",
- "rule": "official test split, minus rows whose normalised dialogue appears in train",
+ "rule": "official test split, minus rows whose normalised dialogue appears in train, minus rows whose reference note (8+ words) exactly or nearly (Jaccard >= 0.8) matches a training note; short identical boilerplate notes are kept and listed",
  "kept": [
   "test1:0",
   "test1:1",
@@ -24,7 +24,6 @@
   "test1:16",
   "test1:17",
   "test1:18",
-  "test1:19",
   "test1:20",
   "test1:21",
   "test1:22",
@@ -38,7 +37,6 @@
   "test1:30",
   "test1:31",
   "test1:32",
-  "test1:33",
   "test1:34",
   "test1:35",
   "test1:36",
@@ -124,7 +122,6 @@
   "test1:117",
   "test1:118",
   "test1:119",
-  "test1:120",
   "test1:121",
   "test1:122",
   "test1:123",
@@ -166,7 +163,6 @@
   "test1:159",
   "test1:160",
   "test1:161",
-  "test1:162",
   "test1:163",
   "test1:164",
   "test1:165",
@@ -197,7 +193,6 @@
   "test1:190",
   "test1:191",
   "test1:192",
-  "test1:193",
   "test1:194",
   "test1:195",
   "test1:196",
@@ -207,5 +202,59 @@
  ],
  "dropped_duplicate_of_train": [
   "test1:106"
+ ],
+ "dropped_note_duplicate_of_train": [
+  {
+   "id": "test1:19",
+   "matches": "train:1007",
+   "kind": "exact"
+  },
+  {
+   "id": "test1:33",
+   "matches": "train:803",
+   "kind": "exact"
+  },
+  {
+   "id": "test1:120",
+   "matches": "train:1027",
+   "kind": "exact"
+  },
+  {
+   "id": "test1:162",
+   "matches": "train:1069",
+   "kind": "exact"
+  },
+  {
+   "id": "test1:193",
+   "matches": "train:421",
+   "kind": "near (0.83)"
+  }
+ ],
+ "kept_shared_boilerplate_note": [
+  "test1:3",
+  "test1:9",
+  "test1:28",
+  "test1:39",
+  "test1:48",
+  "test1:51",
+  "test1:52",
+  "test1:69",
+  "test1:85",
+  "test1:86",
+  "test1:90",
+  "test1:92",
+  "test1:96",
+  "test1:99",
+  "test1:106",
+  "test1:109",
+  "test1:114",
+  "test1:138",
+  "test1:140",
+  "test1:156",
+  "test1:165",
+  "test1:178",
+  "test1:180",
+  "test1:182",
+  "test1:183"
  ]
 }

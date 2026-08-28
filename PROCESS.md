@@ -17,8 +17,13 @@ service of answering that honestly. Loss curves are not the answer; preference i
   Illness"), and the reference note text for that section.
 - Use the dataset's **official split** (1,201 train / 100 validation / 200 test). Each row is
   its own dialogue snippet with its own id, so the split is already by dialogue. Then check
-  for the leakage this dataset actually has: the same dialogue text appearing in more than
-  one split. Any held-out row whose dialogue is also in train is dropped and its id recorded.
+  for the leakage this dataset actually has, which comes in two kinds: the same dialogue text
+  in more than one split, and the same source note behind different dialogues. Any held-out
+  row whose dialogue is also in train, or whose reference note (8 or more words) matches a
+  training note, is dropped and its id recorded. Short boilerplate notes that recur across
+  encounters ("No known drug allergies") are kept and listed; they are the task, not leakage.
+  The second kind was found after training, from the first tuned output examined; the
+  exclusion applies to evaluation and is recorded in `DECISIONS.md`.
   If the same dialogue appears in train and test the result is contaminated. This is the
   first thing a reviewer checks.
 - Freeze the held-out set: write its ids to `eval/holdout_ids.json` and never look at those

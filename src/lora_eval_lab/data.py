@@ -173,6 +173,57 @@ def cross_split_duplicates(reference: list[dict], other: list[dict]) -> list[str
 # Chat formatting
 # ----------------------------------------------------------------------------
 
+def _jaccard(a: str, b: str) -> float:
+    """Token-set overlap of two normalised strings."""
+    x, y = set(a.split()), set(b.split())
+    return len(x & y) / max(1, len(x | y))
+
+
+def cross_split_note_duplicates(
+    reference: list[dict],
+    other: list[dict],
+    min_words: int = 8,
+    threshold: float = 0.8,
+) -> tuple[list[dict], list[str]]:
+    """
+    Find rows in `other` whose reference NOTE duplicates a note in `reference`.
+
+    The same source encounter can appear behind different dialogues, so a dialogue-only
+    check misses it. Short boilerplate notes ("No known drug allergies") recur across
+    unrelated encounters and are not leakage; they are reported, not dropped.
+
+    Args:
+        reference (list[dict]): Rows the model learns from.
+        other (list[dict]): Rows that must not share an encounter with them.
+        min_words (int): Notes shorter than this count as boilerplate.
+        threshold (float): Jaccard overlap at or above which a long note is a near-duplicate.
+
+    Returns:
+        tuple: (dropped, boilerplate) where dropped is a list of
+            {"id", "matches", "kind"} with kind "exact" or "near", and boilerplate is the
+            ids of short identical notes that were kept.
+    """
+    ref_notes = {}
+    for r in reference:
+        ref_notes.setdefault(normalise(r["note"]), r["id"])
+    long_ref = {n: i for n, i in ref_notes.items() if len(n.split()) >= min_words}
+
+    dropped, boilerplate = [], []
+    for r in other:
+        n = normalise(r["note"])
+        if n in ref_notes:
+            if len(n.split()) < min_words:
+                boilerplate.append(r["id"])
+            else:
+                dropped.append({"id": r["id"], "matches": ref_notes[n], "kind": "exact"})
+            continue
+        if len(n.split()) >= min_words:
+            score, match = max(((_jaccard(n, t), i) for t, i in long_ref.items()), default=(0.0, None))
+            if score >= threshold:
+                dropped.append({"id": r["id"], "matches": match, "kind": f"near ({score:.2f})"})
+    return dropped, boilerplate
+
+
 def format_example(row: dict, with_answer: bool = True) -> list[dict]:
     """
     Build the chat messages for one row.
@@ -213,16 +264,24 @@ def build_holdout(raw_dir: Path = RAW_DIR, path: Path = HOLDOUT_PATH) -> dict:
     train = load_split("train", raw_dir)
     heldout = load_split(HELDOUT_SPLIT, raw_dir)
     dropped = cross_split_duplicates(train, heldout)
-    kept = [r["id"] for r in heldout if r["id"] not in set(dropped)]
+    note_dropped, boilerplate = cross_split_note_duplicates(train, heldout)
+    excluded = set(dropped) | {d["id"] for d in note_dropped}
+    kept = [r["id"] for r in heldout if r["id"] not in excluded]
 
     record = {
         "source": SOURCE_REPO,
         "commit": SOURCE_COMMIT,
         "licence": SOURCE_LICENCE,
         "split_file": FILES[HELDOUT_SPLIT],
-        "rule": "official test split, minus rows whose normalised dialogue appears in train",
+        "rule": (
+            "official test split, minus rows whose normalised dialogue appears in train, "
+            "minus rows whose reference note (8+ words) exactly or nearly (Jaccard >= 0.8) "
+            "matches a training note; short identical boilerplate notes are kept and listed"
+        ),
         "kept": kept,
         "dropped_duplicate_of_train": dropped,
+        "dropped_note_duplicate_of_train": note_dropped,
+        "kept_shared_boilerplate_note": boilerplate,
     }
     path.write_text(json.dumps(record, indent=1) + "\n")
     return record

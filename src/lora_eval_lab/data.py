@@ -1,9 +1,10 @@
-"""data: fetch MTS-Dialog at a pinned commit, apply the official split, check for cross-split
+"""
+Fetch MTS-Dialog at a pinned commit, apply the official split, check for cross-split
 duplicate dialogues, freeze the held-out ids, and format rows as chat examples.
 
 Owns: the source pin, the split, the duplicate rule, the prompt template.
-Breaks if: the upstream repo rewrites history (checksums below catch it), or a row's
-section header is not in SECTION_NAMES (fails loudly rather than guessing).
+Breaks if: the upstream repo rewrites history (checksums catch it), or a row's section
+header is not in SECTION_NAMES (fails loudly rather than guessing).
 """
 from __future__ import annotations
 
@@ -27,7 +28,6 @@ FILES = {
     "valid": "MTS-Dialog-ValidationSet.csv",
     "test1": "MTS-Dialog-TestSet-1-MEDIQA-Chat-2023.csv",
 }
-# sha256 of each file at SOURCE_COMMIT; a mismatch means the snapshot moved.
 CHECKSUMS = {
     "train": "65a28681dd59fc159681ea026e44610f2af7bc64a0e7f892d763eb03d9f503dc",
     "valid": "227206520c4534381c0d7fba6d3f09319a9af5a6d9603a93c0341af1198e3958",
@@ -35,7 +35,7 @@ CHECKSUMS = {
 }
 HELDOUT_SPLIT = "test1"
 
-# The dataset's 20 section codes and what a clinician calls them.
+# The dataset's 20 section codes and what a clinician calls them
 SECTION_NAMES = {
     "CC": "Chief Complaint",
     "GENHX": "History of Present Illness",
@@ -69,11 +69,29 @@ USER_TEMPLATE = "Section to write: {section}\n\nConversation:\n{dialogue}"
 
 
 def row_id(split: str, raw_id: str) -> str:
-    """Ids restart at 0 in every split file, so a usable id carries the split name."""
+    """
+    Build a globally unique row id.
+
+    Ids restart at 0 in every split file, so a usable id carries the split name.
+
+    Args:
+        split (str): Split key from FILES.
+        raw_id (str): The ID column value.
+
+    Returns:
+        str: `split:raw_id`.
+    """
     return f"{split}:{raw_id}"
 
 
 def download(dest: Path = RAW_DIR, verify: bool = True) -> None:
+    """
+    Fetch the three pinned CSVs and verify their checksums.
+
+    Args:
+        dest (Path): Directory to write into; existing files are not re-fetched.
+        verify (bool): Compare sha256 against CHECKSUMS and raise on mismatch.
+    """
     dest.mkdir(parents=True, exist_ok=True)
     for split, name in FILES.items():
         path = dest / name
@@ -87,8 +105,19 @@ def download(dest: Path = RAW_DIR, verify: bool = True) -> None:
 
 
 def load_split(split: str, raw_dir: Path = RAW_DIR) -> list[dict]:
+    """
+    Load one split as a list of rows with id, section, dialogue and note.
+
+    Args:
+        split (str): Split key from FILES.
+        raw_dir (Path): Directory holding the CSVs.
+
+    Returns:
+        list[dict]: One dict per row; raises on an unknown section header.
+    """
     with open(raw_dir / FILES[split], newline="", encoding="utf-8") as fh:
         rows = list(csv.DictReader(fh))
+
     out = []
     for r in rows:
         if r["section_header"] not in SECTION_NAMES:
@@ -110,21 +139,36 @@ def normalise(text: str) -> str:
 
 
 def cross_split_duplicates(reference: list[dict], other: list[dict]) -> list[str]:
-    """Ids in `other` whose dialogue also appears in `reference`."""
+    """
+    Find rows in `other` whose dialogue also appears in `reference`.
+
+    Args:
+        reference (list[dict]): Rows the model will learn from.
+        other (list[dict]): Rows that must not overlap with them.
+
+    Returns:
+        list[str]: Ids from `other` that duplicate a reference dialogue.
+    """
     seen = {normalise(r["dialogue"]) for r in reference}
     return [r["id"] for r in other if normalise(r["dialogue"]) in seen]
 
 
 def format_example(row: dict, with_answer: bool = True) -> list[dict]:
-    """Chat messages for one row. The held-out prompt is the same list without the answer."""
+    """
+    Build the chat messages for one row.
+
+    Args:
+        row (dict): A row from load_split.
+        with_answer (bool): Append the reference note as the assistant turn; False gives the
+            prompt the held-out generation uses.
+
+    Returns:
+        list[dict]: System, user and optionally assistant messages.
+    """
+    user = USER_TEMPLATE.format(section=SECTION_NAMES[row["section"]], dialogue=row["dialogue"])
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
-        {
-            "role": "user",
-            "content": USER_TEMPLATE.format(
-                section=SECTION_NAMES[row["section"]], dialogue=row["dialogue"]
-            ),
-        },
+        {"role": "user", "content": user},
     ]
     if with_answer:
         messages.append({"role": "assistant", "content": row["note"]})
@@ -132,11 +176,21 @@ def format_example(row: dict, with_answer: bool = True) -> list[dict]:
 
 
 def build_holdout(raw_dir: Path = RAW_DIR, path: Path = HOLDOUT_PATH) -> dict:
-    """Freeze the held-out ids: the official test split minus any dialogue seen in train."""
+    """
+    Freeze the held-out ids: the official test split minus any dialogue seen in train.
+
+    Args:
+        raw_dir (Path): Directory holding the CSVs.
+        path (Path): Where to write the JSON record.
+
+    Returns:
+        dict: The record written, with `kept` and `dropped_duplicate_of_train` id lists.
+    """
     train = load_split("train", raw_dir)
     heldout = load_split(HELDOUT_SPLIT, raw_dir)
     dropped = cross_split_duplicates(train, heldout)
     kept = [r["id"] for r in heldout if r["id"] not in set(dropped)]
+
     record = {
         "source": SOURCE_REPO,
         "commit": SOURCE_COMMIT,
@@ -151,30 +205,57 @@ def build_holdout(raw_dir: Path = RAW_DIR, path: Path = HOLDOUT_PATH) -> dict:
 
 
 def load_holdout_ids(path: Path = HOLDOUT_PATH) -> list[str]:
+    """Read the frozen held-out ids."""
     return json.loads(path.read_text())["kept"]
 
 
 def training_rows(raw_dir: Path = RAW_DIR) -> tuple[list[dict], list[dict]]:
-    """Train and validation rows, with validation rows that duplicate train removed."""
+    """
+    Load train and validation rows, dropping validation rows that duplicate train.
+
+    Args:
+        raw_dir (Path): Directory holding the CSVs.
+
+    Returns:
+        tuple[list[dict], list[dict]]: Train rows, deduplicated validation rows.
+    """
     train = load_split("train", raw_dir)
     valid = load_split("valid", raw_dir)
     dup = set(cross_split_duplicates(train, valid))
     return train, [r for r in valid if r["id"] not in dup]
 
 
+def _quantile(values: list[int], p: float) -> int:
+    """Nearest-rank quantile of a sorted list."""
+    return values[min(len(values) - 1, int(p * len(values)))]
+
+
 def stats(raw_dir: Path = RAW_DIR) -> str:
-    lines = []
+    """
+    Summarise split sizes, word-length quantiles and the training section mix.
+
+    Args:
+        raw_dir (Path): Directory holding the CSVs.
+
+    Returns:
+        str: Multi-line report for the terminal and the commit message.
+    """
     train, valid = training_rows(raw_dir)
     holdout = load_holdout_ids()
-    lines.append(f"train {len(train)}  valid {len(valid)} (after dedup)  held-out {len(holdout)} (after dedup)")
+    lines = [
+        f"train {len(train)}  valid {len(valid)} (after dedup)  held-out {len(holdout)} (after dedup)"
+    ]
+
     for name, rows in (("train", train), ("valid", valid)):
         words_d = sorted(len(r["dialogue"].split()) for r in rows)
         words_n = sorted(len(r["note"].split()) for r in rows)
-        q = lambda xs, p: xs[min(len(xs) - 1, int(p * len(xs)))]
         lines.append(
-            f"{name}: dialogue words p50/p90/p95/max {q(words_d,.5)}/{q(words_d,.9)}/{q(words_d,.95)}/{words_d[-1]}; "
-            f"note words p50/p90/p95/max {q(words_n,.5)}/{q(words_n,.9)}/{q(words_n,.95)}/{words_n[-1]}"
+            f"{name}: dialogue words p50/p90/p95/max "
+            f"{_quantile(words_d, .5)}/{_quantile(words_d, .9)}/{_quantile(words_d, .95)}/{words_d[-1]}; "
+            f"note words p50/p90/p95/max "
+            f"{_quantile(words_n, .5)}/{_quantile(words_n, .9)}/{_quantile(words_n, .95)}/{words_n[-1]}"
         )
+
     counts = Counter(r["section"] for r in train)
     lines.append("train sections: " + ", ".join(f"{k} {v}" for k, v in counts.most_common()))
     return "\n".join(lines)
@@ -186,6 +267,7 @@ def main() -> None:
     ap.add_argument("--build-holdout", action="store_true", help="write eval/holdout_ids.json")
     ap.add_argument("--stats", action="store_true", help="split sizes, lengths, section mix")
     args = ap.parse_args()
+
     if args.download:
         download()
     if args.build_holdout:

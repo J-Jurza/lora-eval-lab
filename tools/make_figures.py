@@ -1,4 +1,10 @@
-"""Figures for Post 2, from committed results only. Regenerate: python tools/make_figures.py (needs the dev extra: pip install -e ".[dev]")"""
+"""
+Figures for the README and Post 2, from committed results only.
+
+Regenerate: python tools/make_figures.py (needs the dev extra: pip install -e ".[dev]").
+The judging-loop diagram is Mermaid (docs/figures/fig4_judging_loop.mmd); render it with
+`npx -y -p @mermaid-js/mermaid-cli mmdc -i docs/figures/fig4_judging_loop.mmd -o docs/figures/fig4_judging_loop.png -c docs/figures/mermaid.config.json -s 3 -b white -w 1500`.
+"""
 import json
 from pathlib import Path
 
@@ -7,73 +13,147 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
+# ----------------------------------------------------------------------------
+# Data and style tokens
+# ----------------------------------------------------------------------------
+
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "figures"
 m = json.load(open(ROOT / "results/metrics.json"))
 log = [json.loads(l) for l in open(ROOT / "results/train_log.jsonl")]
 
-BASE, TUNED, INK, GREY = "#4a6fa5", "#d9822b", "#222222", "#8a8a8a"
-plt.rcParams.update({"font.size": 13, "axes.spines.top": False, "axes.spines.right": False, "figure.facecolor": "white", "axes.facecolor": "white"})
+SURFACE = "#fcfcfb"
+INK, INK2, MUTED = "#0b0b0b", "#52514e", "#8b8a86"
+GRID = "#e6e5e1"
+BASE, TUNED = "#2a78d6", "#eb6834"      # categorical slots 1 and 2, validated
+DEEMPH = "#c9c8c3"
 
-# 1. ROUGE up, preference down
-fig, axes = plt.subplots(1, 2, figsize=(10, 4.6), dpi=200)
+plt.rcParams.update({
+    "font.family": "sans-serif",
+    "font.size": 12,
+    "text.color": INK,
+    "axes.labelcolor": INK2,
+    "axes.edgecolor": GRID,
+    "axes.linewidth": 1,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.spines.left": False,
+    "xtick.color": INK2,
+    "ytick.color": INK2,
+    "xtick.labelsize": 11,
+    "ytick.labelsize": 11,
+    "figure.facecolor": SURFACE,
+    "axes.facecolor": SURFACE,
+    "axes.grid": True,
+    "axes.grid.axis": "y",
+    "grid.color": GRID,
+    "grid.linewidth": 1,
+    "grid.linestyle": "-",
+    "axes.axisbelow": True,
+})
+
+
+def rounded_bar(ax, x, height, width, color, bottom=0.0):
+    """A bar with a 4px-style rounded data end and a square baseline."""
+    r = min(width * 0.18, height * 0.5) if height > 0 else 0
+    ax.add_patch(FancyBboxPatch(
+        (x - width / 2, bottom), width, height,
+        boxstyle=f"round,pad=0,rounding_size={r}", fc=color, ec="none", mutation_aspect=1,
+    ))
+    ax.add_patch(plt.Rectangle((x - width / 2, bottom), width, min(height, r), fc=color, ec="none"))
+
+
+def title(fig, claim, sub):
+    """Claim as the title, one muted line under it, both left-aligned."""
+    fig.text(0.04, 0.95, claim, fontsize=14, weight="semibold", color=INK, ha="left", va="top")
+    fig.text(0.04, 0.885, sub, fontsize=11, color=INK2, ha="left", va="top")
+
+
+# ----------------------------------------------------------------------------
+# Figure 1: ROUGE up, preference down
+# ----------------------------------------------------------------------------
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4.8), dpi=200)
+fig.subplots_adjust(top=0.72, bottom=0.14, left=0.08, right=0.97, wspace=0.35)
 r = m["rates"]; lo, hi = m["win_rate_ci"]
+W = 0.34
+
 ax = axes[0]
-ax.bar(["Base", "Tuned"], [m["rouge_l"]["base"], m["rouge_l"]["tuned"]], color=[BASE, TUNED], width=0.55)
-for i, v in enumerate([m["rouge_l"]["base"], m["rouge_l"]["tuned"]]): ax.text(i, v + 0.008, f"{v:.2f}", ha="center", color=INK)
-ax.set_title("Overlap with the reference (ROUGE-L F1)\nwent up by half", loc="left", fontsize=12)
-ax.set_ylim(0, 0.36); ax.set_ylabel("ROUGE-L F1")
+for i, (v, c) in enumerate([(m["rouge_l"]["base"], BASE), (m["rouge_l"]["tuned"], TUNED)]):
+    rounded_bar(ax, i, v, W, c)
+    ax.text(i, v + 0.012, f"{v:.2f}", ha="center", va="bottom", color=INK, fontsize=12)
+ax.set_xlim(-0.6, 1.6); ax.set_ylim(0, 0.34)
+ax.set_xticks([0, 1], ["Base model", "Fine-tuned"]); ax.set_yticks([0, 0.1, 0.2, 0.3])
+ax.set_ylabel("ROUGE-L F1 against the reference")
+ax.set_title("Overlap with the reference rose by half", loc="left", fontsize=12, color=INK, pad=10)
+
 ax = axes[1]
-vals = [r["base"], r["tuned"]]
-ax.bar(["Base", "Tuned"], vals, color=[BASE, TUNED], width=0.55)
-ax.errorbar([1], [r["tuned"]], yerr=[[r["tuned"] - lo], [hi - r["tuned"]]], fmt="none", ecolor=INK, capsize=6, lw=1.5)
-ax.text(0, vals[0] + 0.012, f"{vals[0]*100:.1f}%", ha="center", color=INK)
-ax.text(0.68, vals[1] + 0.005, f"{vals[1]*100:.1f}%", ha="center", color=INK)
-ax.axhline(0.5, color=GREY, ls=":", lw=1); ax.text(1.42, 0.505, "parity", color=GREY, fontsize=10, va="bottom", ha="right")
-ax.set_title("Blind preference over 171 pairs\nwent down (95% interval shown)", loc="left", fontsize=12)
-ax.set_ylim(0, 0.66); ax.set_ylabel("Share of pairs preferred")
-fig.suptitle("The overlap metric rewarded the fine-tune. Blind readers did not.", x=0.02, ha="left", fontsize=14, color=INK)
-fig.tight_layout(rect=(0, 0, 1, 0.92)); fig.savefig(OUT / "fig1_rouge_vs_preference.png"); plt.close(fig)
+for i, (v, c) in enumerate([(r["base"], BASE), (r["tuned"], TUNED)]):
+    rounded_bar(ax, i, v, W, c)
+ax.errorbar([1], [r["tuned"]], yerr=[[r["tuned"] - lo], [hi - r["tuned"]]], fmt="none", ecolor=INK, elinewidth=1.5, capsize=5, capthick=1.5)
+ax.text(0, r["base"] + 0.015, f"{r['base']*100:.1f}%", ha="center", va="bottom", color=INK, fontsize=12)
+ax.text(1.28, r["tuned"], f"{r['tuned']*100:.1f}%", ha="left", va="center", color=INK, fontsize=12)
+ax.text(1.28, lo - 0.005, f"95% interval\n{lo*100:.0f} to {hi*100:.0f}%", ha="left", va="top", color=INK2, fontsize=9.5)
+ax.axhline(0.5, color=INK2, lw=1); ax.text(-0.55, 0.512, "parity", color=INK2, fontsize=10, va="bottom")
+ax.set_xlim(-0.6, 1.9); ax.set_ylim(0, 0.62)
+ax.set_xticks([0, 1], ["Base model", "Fine-tuned"]); ax.set_yticks([0, 0.2, 0.4, 0.6], ["0%", "20%", "40%", "60%"])
+ax.set_ylabel("Share of pairs preferred, blind")
+ax.set_title("Blind preference fell below parity", loc="left", fontsize=12, color=INK, pad=10)
 
-# 2. Loss curve
-tr = [(e["step"], e["loss"]) for e in log if "loss" in e]; ev = [(e["step"], e["eval_loss"]) for e in log if "eval_loss" in e]
-fig, ax = plt.subplots(figsize=(9, 4.6), dpi=200)
-ax.plot(*zip(*tr), marker="o", color=GREY, label="training loss")
-ax.plot(*zip(*ev), marker="o", color=TUNED, label="validation loss (98 held-back pairs)")
-ax.axvline(150, color=GREY, ls=":", lw=1); ax.text(152, 1.86, "epoch 2 starts", color=GREY, fontsize=10)
-ax.set_xlabel("training step (300 total, 15 minutes on a T4)"); ax.set_ylabel("cross-entropy loss"); ax.set_ylim(1.2, 1.9)
-ax.legend(frameon=False, loc="lower left")
-ax.set_title("Validation loss fell from 1.62 to 1.38 and flattened. It measured the wrong question.", loc="left", fontsize=13)
-fig.tight_layout(); fig.savefig(OUT / "fig2_loss_curve.png"); plt.close(fig)
+title(fig, "The overlap metric rewarded the fine-tune. Blind readers did not.",
+      "171 held-out pairs, each judged twice with the order swapped. ROUGE-L F1 and preference share.")
+fig.savefig(OUT / "fig1_rouge_vs_preference.png"); plt.close(fig)
 
-# 3. Taxonomy
-tax = m["taxonomy"]; order = ["hallucinated fact", "omitted fact", "format break", "other", "wrong section"]
-fig, ax = plt.subplots(figsize=(9, 4.2), dpi=200)
-vals = [tax.get(k, 0) for k in order]
-colors = [TUNED if k == "hallucinated fact" else GREY for k in order]
-ax.barh(order[::-1], vals[::-1], color=colors[::-1])
-for i, v in enumerate(vals[::-1]): ax.text(v + 0.8, i, str(v), va="center", color=INK)
-ax.set_xlim(0, 50); ax.set_xlabel("pairs the fine-tuned model lost (88 in total)")
-ax.set_title("Why it lost: 41 of 88 losses were a fact the patient never said", loc="left", fontsize=13)
-fig.tight_layout(); fig.savefig(OUT / "fig3_taxonomy.png"); plt.close(fig)
+# ----------------------------------------------------------------------------
+# Figure 2: loss curve
+# ----------------------------------------------------------------------------
 
-# 4. Blind judging loop diagram (boxes, no mermaid CLI available)
-fig, ax = plt.subplots(figsize=(10, 4.8), dpi=200); ax.set_xlim(0, 10); ax.set_ylim(0, 5); ax.axis("off")
-def box(x, y, w, h, text, fc="#f4f4f4", ec=INK):
-    """Rounded labelled box at (x, y) with width w and height h."""
-    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.02,rounding_size=0.12", fc=fc, ec=ec, lw=1.4))
-    ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=11, color=INK)
-def arrow(x1, y1, x2, y2):
-    """Straight arrow from (x1, y1) to (x2, y2)."""
-    ax.annotate("", xy=(x2, y2), xytext=(x1, y1), arrowprops=dict(arrowstyle="->", color=INK, lw=1.3))
-box(0.2, 3.3, 2.2, 1.2, "194 sealed exam\nconversations")
-box(3.0, 4.0, 2.0, 0.8, "base note", fc="#e3ebf5"); box(3.0, 2.6, 2.0, 0.8, "tuned note", fc="#fbe9d6")
-arrow(2.4, 4.1, 3.0, 4.4); arrow(2.4, 3.7, 3.0, 3.0)
-box(5.4, 3.0, 2.6, 1.6, "judge sees A and B,\nkey sealed,\njudged twice with\nthe order swapped")
-arrow(5.0, 4.4, 5.4, 4.1); arrow(5.0, 3.0, 5.4, 3.4)
-box(8.3, 3.2, 1.6, 1.2, "kept only if\nboth verdicts\nagree"); arrow(8.0, 3.8, 8.3, 3.8)
-box(5.4, 1.0, 2.6, 0.9, "owner scores 30 pairs\nblind, before the judge", fc="#eef5e9"); arrow(6.7, 1.9, 6.7, 3.0)
-ax.text(8.3, 2.3, "23 of 194 dropped:\nall favoured the\nleft slot", fontsize=10, color=GREY, va="center")
-ax.set_title("Blind judging: the key stays sealed, every pair is judged twice, a human anchors the judge", loc="left", fontsize=13)
-fig.tight_layout(); fig.savefig(OUT / "fig4_judging_loop.png"); plt.close(fig)
-print("wrote", sorted(p.name for p in OUT.glob("*.png")))
+tr = [(e["step"], e["loss"]) for e in log if "loss" in e]
+ev = [(e["step"], e["eval_loss"]) for e in log if "eval_loss" in e]
+fig, ax = plt.subplots(figsize=(10, 4.8), dpi=200)
+fig.subplots_adjust(top=0.78, bottom=0.14, left=0.08, right=0.9)
+for pts, c, name in [(tr, DEEMPH, "training loss"), (ev, TUNED, "validation loss, 98 held-back pairs")]:
+    xs, ys = zip(*pts)
+    ax.plot(xs, ys, color=c, lw=2, solid_joinstyle="round", solid_capstyle="round", label=name, zorder=2)
+    ax.plot(xs, ys, "o", ms=8, mfc=c, mec=SURFACE, mew=2, zorder=3)
+ax.text(302, ev[-1][1], f"{ev[-1][1]:.2f}", color=INK, va="center", ha="left", fontsize=11)
+ax.text(302, tr[-1][1], f"{tr[-1][1]:.2f}", color=INK2, va="center", ha="left", fontsize=11)
+ax.axvline(150, color=GRID, lw=1, zorder=1); ax.text(152, 1.86, "epoch 2", color=MUTED, fontsize=10)
+ax.set_xlim(15, 330); ax.set_ylim(1.2, 1.9); ax.set_yticks([1.2, 1.4, 1.6, 1.8])
+ax.set_xlabel("training step (300 steps, 15 minutes on a free T4)")
+ax.set_ylabel("cross-entropy loss")
+ax.legend(frameon=False, loc="lower left", fontsize=11)
+title(fig, "Validation loss fell from 1.62 to 1.38 and flattened.",
+      "No overfitting. The curve measured how well the model predicts the reference notes, not whether the notes were true.")
+fig.savefig(OUT / "fig2_loss_curve.png"); plt.close(fig)
+
+# ----------------------------------------------------------------------------
+# Figure 3: taxonomy
+# ----------------------------------------------------------------------------
+
+tax = m["taxonomy"]
+order = ["hallucinated fact", "omitted fact", "format break", "other", "wrong section"]
+labels = ["Invented a fact the patient never said", "Left out a relevant fact", "Repetition loop or not a note", "Style only", "Wrong section"]
+fig, ax = plt.subplots(figsize=(10, 4.6), dpi=200)
+fig.subplots_adjust(top=0.78, bottom=0.14, left=0.36, right=0.95)
+ax.grid(False); ax.grid(True, axis="x", color=GRID, lw=1)
+ys = list(range(len(order)))[::-1]
+for y, k, lab in zip(ys, order, labels):
+    v = tax.get(k, 0); c = TUNED if k == "hallucinated fact" else DEEMPH
+    ax.add_patch(FancyBboxPatch((0, y - 0.28), v, 0.56, boxstyle="round,pad=0,rounding_size=0.28", fc=c, ec="none"))
+    ax.add_patch(plt.Rectangle((0, y - 0.28), min(v, 0.5), 0.56, fc=c, ec="none"))
+    ax.text(v + 0.8, y, str(v), va="center", color=INK, fontsize=12)
+ax.set_yticks(ys, labels); ax.tick_params(axis="y", length=0)
+ax.set_xlim(0, 48); ax.set_ylim(-0.7, len(order) - 0.3); ax.set_xticks([0, 10, 20, 30, 40])
+ax.set_xlabel("pairs the fine-tuned model lost, 88 in total")
+title(fig, "Why it lost: 41 of 88 losses were an invented fact.",
+      "Every kept pair the base model won, read and labelled with its dominant failure.")
+fig.savefig(OUT / "fig3_taxonomy.png"); plt.close(fig)
+
+# ----------------------------------------------------------------------------
+# Figure 4: judging loop (Mermaid source; render with the CLI, see the docstring)
+# ----------------------------------------------------------------------------
+
+# The Mermaid source and config live in docs/figures and are rendered by the CLI (see docstring).
+
+print("wrote", sorted(p.name for p in OUT.glob("fig*")))

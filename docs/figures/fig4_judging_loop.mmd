@@ -1,0 +1,23 @@
+flowchart LR
+    E["194 sealed exam<br/>conversations"]
+    E --> B["Base model<br/>note"]
+    E --> T["Fine-tuned<br/>note"]
+    B --> J1
+    T --> J1
+    subgraph J ["Judge, blind: which note is which stays sealed"]
+        direction TB
+        J1["Sees the pair as A and B"] --> J2["Judged twice,<br/>order swapped"]
+    end
+    J2 --> K{"Both verdicts<br/>name the<br/>same note?"}
+    K -->|"yes: 171 pairs"| M["Counted in<br/>the win rate"]
+    K -->|"no: 23 pairs"| D["Dropped and counted<br/>(all 23 favoured<br/>the left slot)"]
+    H["Owner scores 30 pairs<br/>blind, before the judge"] -.->|"kappa 0.41"| M
+    style E fill:#fcfcfb,stroke:#c9c8c3,color:#0b0b0b
+    style B fill:#dbe8f9,stroke:#2a78d6,color:#0b0b0b
+    style T fill:#fde3d6,stroke:#eb6834,color:#0b0b0b
+    style J1 fill:#f3f2ee,stroke:#c9c8c3,color:#0b0b0b
+    style J2 fill:#f3f2ee,stroke:#c9c8c3,color:#0b0b0b
+    style K fill:#fcfcfb,stroke:#52514e,color:#0b0b0b
+    style M fill:#e3f3ea,stroke:#1baf7a,color:#0b0b0b
+    style D fill:#f3f2ee,stroke:#c9c8c3,color:#52514e
+    style H fill:#fcfcfb,stroke:#c9c8c3,color:#0b0b0b

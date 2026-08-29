@@ -70,38 +70,36 @@ def title(fig, claim, sub):
 
 
 # ----------------------------------------------------------------------------
-# Figure 1: ROUGE up, preference down
+# Figure 1: ROUGE-L and blind preference, base vs tuned
 # ----------------------------------------------------------------------------
 
 fig, axes = plt.subplots(1, 2, figsize=(10, 4.8), dpi=200)
-fig.subplots_adjust(top=0.72, bottom=0.14, left=0.08, right=0.97, wspace=0.35)
+fig.subplots_adjust(top=0.78, bottom=0.14, left=0.08, right=0.97, wspace=0.35)
 r = m["rates"]; lo, hi = m["win_rate_ci"]
 W = 0.34
 
 ax = axes[0]
-for i, (v, c) in enumerate([(m["rouge_l"]["base"], BASE), (m["rouge_l"]["tuned"], TUNED)]):
-    rounded_bar(ax, i, v, W, c)
+ax.bar([0, 1], [m["rouge_l"]["base"], m["rouge_l"]["tuned"]], width=W, color=[BASE, TUNED])
+for i, v in enumerate([m["rouge_l"]["base"], m["rouge_l"]["tuned"]]):
     ax.text(i, v + 0.012, f"{v:.2f}", ha="center", va="bottom", color=INK, fontsize=12)
 ax.set_xlim(-0.6, 1.6); ax.set_ylim(0, 0.34)
 ax.set_xticks([0, 1], ["Base model", "Fine-tuned"]); ax.set_yticks([0, 0.1, 0.2, 0.3])
-ax.set_ylabel("ROUGE-L F1 against the reference")
-ax.set_title("Overlap with the reference rose by half", loc="left", fontsize=12, color=INK, pad=10)
+ax.set_ylabel("ROUGE-L F1")
+ax.set_title("ROUGE-L against the reference note", loc="left", fontsize=12, color=INK, pad=10)
 
 ax = axes[1]
-for i, (v, c) in enumerate([(r["base"], BASE), (r["tuned"], TUNED)]):
-    rounded_bar(ax, i, v, W, c)
+ax.bar([0, 1], [r["base"], r["tuned"]], width=W, color=[BASE, TUNED])
 ax.errorbar([1], [r["tuned"]], yerr=[[r["tuned"] - lo], [hi - r["tuned"]]], fmt="none", ecolor=INK, elinewidth=1.5, capsize=5, capthick=1.5)
 ax.text(0, r["base"] + 0.015, f"{r['base']*100:.1f}%", ha="center", va="bottom", color=INK, fontsize=12)
 ax.text(1.28, r["tuned"], f"{r['tuned']*100:.1f}%", ha="left", va="center", color=INK, fontsize=12)
-ax.text(1.28, lo - 0.005, f"95% interval\n{lo*100:.0f} to {hi*100:.0f}%", ha="left", va="top", color=INK2, fontsize=9.5)
-ax.axhline(0.5, color=INK2, lw=1); ax.text(-0.55, 0.512, "parity", color=INK2, fontsize=10, va="bottom")
+ax.axhline(0.5, color=INK2, lw=1); ax.text(-0.55, 0.512, "50%", color=INK2, fontsize=10, va="bottom")
 ax.set_xlim(-0.6, 1.9); ax.set_ylim(0, 0.62)
 ax.set_xticks([0, 1], ["Base model", "Fine-tuned"]); ax.set_yticks([0, 0.2, 0.4, 0.6], ["0%", "20%", "40%", "60%"])
-ax.set_ylabel("Share of pairs preferred, blind")
-ax.set_title("Blind preference fell below parity", loc="left", fontsize=12, color=INK, pad=10)
+ax.set_ylabel("Share of kept pairs preferred")
+ax.set_title("Blind preference (95% interval shown)", loc="left", fontsize=12, color=INK, pad=10)
 
-title(fig, "The overlap metric rewarded the fine-tune. Blind readers did not.",
-      "171 held-out pairs, each judged twice with the order swapped. ROUGE-L F1 and preference share.")
+title(fig, "Overlap with the reference and blind preference, base model versus fine-tuned",
+      "171 held-out pairs, each judged twice with the order swapped.")
 fig.savefig(OUT / "fig1_rouge_vs_preference.png"); plt.close(fig)
 
 # ----------------------------------------------------------------------------
@@ -120,11 +118,11 @@ ax.text(302, ev[-1][1], f"{ev[-1][1]:.2f}", color=INK, va="center", ha="left", f
 ax.text(302, tr[-1][1], f"{tr[-1][1]:.2f}", color=INK2, va="center", ha="left", fontsize=11)
 ax.axvline(150, color=GRID, lw=1, zorder=1); ax.text(152, 1.86, "epoch 2", color=MUTED, fontsize=10)
 ax.set_xlim(15, 330); ax.set_ylim(1.2, 1.9); ax.set_yticks([1.2, 1.4, 1.6, 1.8])
-ax.set_xlabel("training step (300 steps, 15 minutes on a free T4)")
+ax.set_xlabel("training step")
 ax.set_ylabel("cross-entropy loss")
 ax.legend(frameon=False, loc="lower left", fontsize=11)
-title(fig, "Validation loss fell from 1.62 to 1.38 and flattened.",
-      "No overfitting. The curve measured how well the model predicts the reference notes, not whether the notes were true.")
+title(fig, "Training and validation loss over 300 steps",
+      "QLoRA on Qwen2.5-1.5B-Instruct, 1,200 training pairs, validation on 98 held-back pairs, one free T4.")
 fig.savefig(OUT / "fig2_loss_curve.png"); plt.close(fig)
 
 # ----------------------------------------------------------------------------
@@ -146,8 +144,8 @@ for y, k, lab in zip(ys, order, labels):
 ax.set_yticks(ys, labels); ax.tick_params(axis="y", length=0)
 ax.set_xlim(0, 48); ax.set_ylim(-0.7, len(order) - 0.3); ax.set_xticks([0, 10, 20, 30, 40])
 ax.set_xlabel("pairs the fine-tuned model lost, 88 in total")
-title(fig, "Why it lost: 41 of 88 losses were an invented fact.",
-      "Every kept pair the base model won, read and labelled with its dominant failure.")
+title(fig, "Dominant failure in the 88 pairs the fine-tuned model lost",
+      "One label per pair, assigned by reading the conversation and both notes.")
 fig.savefig(OUT / "fig3_taxonomy.png"); plt.close(fig)
 
 # ----------------------------------------------------------------------------

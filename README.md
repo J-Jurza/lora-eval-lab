@@ -106,6 +106,8 @@ human who is not a clinician, and a dataset whose reference notes carry facts th
 lack, so the model was partly trained to invent. A prompted base model was the harder
 opponent than expected, and that is the finding worth carrying to the next attempt.
 
+**Write-up:** [Did your fine-tune actually get better? The metric you trust cannot tell you](https://medium.com/@honzj/did-your-fine-tune-actually-get-better-the-metric-you-trust-cannot-tell-you-a980f91c7266) (Medium, 30 August 2026).
+
 ## What gets measured
 
 | Question | Method | Blind spot, stated |

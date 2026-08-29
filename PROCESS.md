@@ -68,7 +68,8 @@ three texts: reference, base output, tuned output.
 - For each dialogue, present the judge with the dialogue, the reference, and the two outputs
   labelled **A** and **B**, with **which one is the tuned model randomised** and the mapping
   stored separately. The judge never knows.
-- The judge is an LLM (Gemini Flash on the free tier, as in rag-eval-lab) given the rubric in
+- The judge is an LLM (Gemini Flash, as in rag-eval-lab; prepaid credit, since new keys carry no
+  free quota) given the rubric in
   `eval/rubric.md`: score A and B on faithfulness, completeness, format and concision, then
   state a preference or a tie, with one sentence of reason.
 - Run each pair **twice with A/B swapped** and keep only consistent verdicts; position bias

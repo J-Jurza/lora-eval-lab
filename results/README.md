@@ -4,7 +4,7 @@ Committed outputs, in the order they were produced.
 
 | File | Step | What it is |
 |---|---|---|
-| `generations_base.jsonl` | 2 | Base model outputs, 199 held-out dialogues, greedy, one JSON line each with settings and prompt fingerprint |
+| `generations_base.jsonl` | 2 | Base model outputs, all 199 official test dialogues (194 used after the note-level duplicate check), greedy, one JSON line each with settings and prompt fingerprint |
 | `train_config.json`, `train_log.jsonl` | 3 | Hyperparameters, row counts, timing; train and validation loss every 25 steps |
 | `generations_tuned.jsonl` | 4 | Tuned model outputs, same prompts (fingerprints match) |
 | `blinding_key.json` | 5 | Which side is the tuned model per pair; read only by the scoring code |

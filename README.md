@@ -124,11 +124,11 @@ Everything except training and generation runs on CPU.
 python3.12 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 python -m lora_eval_lab.data --download --stats   # pinned CSVs, checksums verified
-pytest -q                                          # 38 pure-logic tests, no model, no API
+pytest -q                                          # 40 pure-logic tests, no model, no API
 ```
 
 The two GPU steps run in one Colab notebook, `notebooks/lora_eval_lab_colab.ipynb`
-(T4, about an hour). Then, with a free Gemini key in `.env`:
+(T4, about an hour). Then, with a Gemini key in `.env` (prepaid credit; the run cost under one dollar):
 
 ```bash
 pip install -e ".[judge]"
@@ -194,7 +194,7 @@ src/lora_eval_lab/
 eval/           rubric.md · judge_prompt.md · holdout_ids.json
 notebooks/      the Colab notebook for the two GPU steps
 results/        generations, key, verdicts, human pack, losses, metrics (committed)
-tests/          38 tests with hand-computed expected values
+tests/          40 tests with hand-computed expected values
 PROCESS.md      what happens, step by step, and why
 DECISIONS.md    every choice that shapes the result, with alternatives rejected
 BUILD_PLAN.md   the build, one commit per step

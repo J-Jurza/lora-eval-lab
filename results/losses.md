@@ -4,7 +4,6 @@ Label each with one of: hallucinated fact, omitted fact, wrong section, format b
 
 **Labelling provenance (2026-08-30).** Labelled by the implementing agent (Claude, a different model from the Gemini judge) reading the conversation, both outputs and the judge's two reasons, one label per pair, the dominant failure where several apply (an invented fact outranks style; a repetition loop or a non-note output is a format break). The owner audits a seeded random 15 and the README reports the agreement rate.
 
-
 ## Loss test1:2
 
 **Section:** Review of Systems
@@ -46,7 +45,6 @@ Review of Systems: No reported pain, stiffness, or weakness in the muscles. No j
 
 LABEL: omitted fact
 
-
 ## Loss test1:5
 
 **Section:** Family and Social History
@@ -82,7 +80,6 @@ Family and Social History:
 **Judge said:** Candidate B accurately and specifically documents that there were no changes to the patient's history since the last visit, whereas Candidate A is overly generic. / Candidate A accurately reflects the dialogue stating that medical and social history were reviewed and unchanged, whereas Candidate B's use of 'noncontributory' is less precise.
 
 LABEL: omitted fact
-
 
 ## Loss test1:6
 
@@ -120,7 +117,6 @@ The patient is a 77-year-old female who was sedated with Ativan due to respirato
 **Judge said:** Candidate B is faithful to the dialogue, whereas Candidate A includes the unsupported detail that the patient arrived by ambulance. / Candidate A is fully faithful to the conversation, whereas Candidate B includes an unsupported detail about the patient arriving by ambulance.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:7
 
@@ -166,7 +162,6 @@ Family and Social History:
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:8
 
 **Section:** Family and Social History
@@ -209,7 +204,6 @@ Family and Social History:
 **Judge said:** Candidate A is completely faithful to the conversation, whereas Candidate B contains critical inaccuracies regarding the patient's smoking status and employment history. / Candidate B is completely faithful to the dialogue, whereas Candidate A incorrectly claims the patient is a smoker and a social worker.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:10
 
@@ -254,7 +248,6 @@ The patient is an African American woman seventy-nine years old, five foot three
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:13
 
 **Section:** Assessment
@@ -291,7 +284,6 @@ Assessment: The patient reports feeling good overall, with no reported issues re
 **Judge said:** Candidate B captures all clinically relevant details regarding the management and control of the patient's anxiety and hypertension, whereas Candidate A is overly brief. / Candidate A provides a helpful clinical summary of the status of the patient's conditions, whereas Candidate B merely lists the diagnosis names without any context on control or treatment.
 
 LABEL: omitted fact
-
 
 ## Loss test1:15
 
@@ -334,7 +326,6 @@ Review of Systems: No new or concerning symptoms reported.
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:18
 
 **Section:** Assessment
@@ -367,7 +358,6 @@ Assessment: The patient reports feeling always tired, with underlying conditions
 **Judge said:** Candidate A is much more complete because it includes fatigue, the patient's primary complaint, which Candidate B omits. / Candidate B is preferable because it includes the patient's chief complaint of fatigue in the assessment, whereas Candidate A omits it entirely.
 
 LABEL: omitted fact
-
 
 ## Loss test1:22
 
@@ -407,7 +397,6 @@ The patient has been happily married for forty-five years. They reside in a smal
 **Judge said:** Candidate B includes a proper section header and avoids misgendering the patient, whereas Candidate A incorrectly uses female pronouns for a patient who mentions having a wife. / Candidate A accurately captures all relevant social history using gender-neutral terms, whereas Candidate B assumes the patient is female without support from the dialogue.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:23
 
@@ -449,7 +438,6 @@ Allergies: No known allergies.
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:24
 
 **Section:** Plan
@@ -489,7 +477,6 @@ Plan: The patient will follow a low salt diet, avoiding foods high in salt such 
 
 LABEL: omitted fact
 
-
 ## Loss test1:28
 
 **Section:** Disposition
@@ -524,7 +511,6 @@ Disposition: Discharged home.
 **Judge said:** Candidate B correctly captures that the patient was discharged specifically to home and uses standard clinical formatting. / Candidate A is slightly more complete by specifying that the patient was discharged to home, which was explicitly mentioned in the conversation.
 
 LABEL: omitted fact
-
 
 ## Loss test1:30
 
@@ -561,7 +547,6 @@ Family history: The patient's father has been diagnosed with arthritis in both h
 
 LABEL: omitted fact
 
-
 ## Loss test1:32
 
 **Section:** Emergency Department Course
@@ -594,7 +579,6 @@ Emergency Department Course: The patient was advised by Poison Control to seek f
 **Judge said:** Candidate B captures the key discussion regarding the Poison Control consultation, whereas Candidate A completely omits Poison Control, includes ungrounded details, and repeats a sentence verbatim. / Candidate A captures the essential clinical details including the Poison Control consultation, whereas Candidate B completely omits the consultation, hallucinates details about who brought the patient in, and includes verbatim repetition.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:35
 
@@ -633,7 +617,6 @@ Allergies: The patient is allergic to Bactrim, which causes nausea and vomiting.
 **Judge said:** Candidate B is more complete because it includes the specific reactions (nausea, vomiting, skin rash) associated with each allergy. / Candidate A is preferred because it includes the specific reactions to both Bactrim and adhesive tape, which are clinically relevant details omitted by Candidate B.
 
 LABEL: omitted fact
-
 
 ## Loss test1:37
 
@@ -677,7 +660,6 @@ Family and Social History:
 
 LABEL: other
 
-
 ## Loss test1:43
 
 **Section:** Assessment
@@ -711,7 +693,6 @@ Assessment: No intra-abdominal pathology noted.
 **Judge said:** Candidate B clearly states the clinical finding in context, whereas Candidate A is too ambiguous on its own. / Candidate A provides a complete, properly formatted assessment statement, whereas Candidate B lacks necessary clinical context.
 
 LABEL: omitted fact
-
 
 ## Loss test1:47
 
@@ -754,7 +735,6 @@ Chief Complaint: Congestion and fever in a two-month-old baby girl.
 
 LABEL: omitted fact
 
-
 ## Loss test1:48
 
 **Section:** Family and Social History
@@ -793,7 +773,6 @@ Family and Social History:
 **Judge said:** Candidate A accurately captures the family details (husband, children) and smoking status, whereas Candidate B omits family context and inaccurately frames acute stress as a history of stress. / Candidate B is preferred because it includes the family structure (husband and children) discussed in the conversation, whereas Candidate A omits the family context entirely.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:50
 
@@ -841,7 +820,6 @@ The patient experienced a recent injury to their left wrist, which was previousl
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:56
 
 **Section:** Review of Systems
@@ -878,7 +856,6 @@ Review of Systems: No reported problems with eyesight, including no blur, double
 **Judge said:** Candidate B is completely faithful to the conversation, whereas Candidate A includes unmentioned symptoms such as photophobia and tearing. / Candidate A accurately reflects the dialogue, whereas Candidate B introduces unmentioned symptoms such as photophobia and tearing.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:58
 
@@ -924,7 +901,6 @@ The patient reports occasional difficulty controlling their bladder, but no pain
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:60
 
 **Section:** Laboratory Results
@@ -961,7 +937,6 @@ Lab Results: CBC (Complete Blood Count) and BMP (Blood Profile) are normal. Card
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:62
 
 **Section:** History of Present Illness
@@ -996,7 +971,6 @@ The patient, a seventeen-year-old female, presented with an obstructed airway, w
 **Judge said:** Candidate A is preferred because it includes the detail about the patient presenting with an obstructed airway, making it slightly more complete than Candidate B. / Candidate B is slightly more complete than Candidate A as it explicitly mentions the obstructed airway present in the conversation.
 
 LABEL: omitted fact
-
 
 ## Loss test1:64
 
@@ -1044,7 +1018,6 @@ Chief Complaint: Shortness of breath, new onset, more frequent and more severe w
 **Judge said:** Candidate A provides a complete chief complaint capturing key details like new onset and worsening with exertion, whereas Candidate B is overly brief. / Candidate B captures key clinical context regarding the chief complaint, such as its new onset and exertional nature, while Candidate A is overly brief.
 
 LABEL: omitted fact
-
 
 ## Loss test1:66
 
@@ -1107,7 +1080,6 @@ Review of Systems: No fever, chills, night sweats, weight gain or loss, visual c
 
 LABEL: format break
 
-
 ## Loss test1:67
 
 **Section:** History of Present Illness
@@ -1159,7 +1131,6 @@ The patient reports a long-standing on and off lower back pain on the right side
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:68
 
 **Section:** Family and Social History
@@ -1198,7 +1169,6 @@ Married. Part-time farmer. No substance use.
 
 LABEL: omitted fact
 
-
 ## Loss test1:70
 
 **Section:** Medications
@@ -1235,7 +1205,6 @@ Medications: Morphine, Darvocet, Flomax, Avodart, Ibuprofen.
 **Judge said:** Candidate B accurately lists all medications discussed in the conversation, whereas Candidate A incorrectly replaces Darvocet with Darvon and repeats it. / Candidate A accurately captures all medications mentioned in the conversation, whereas Candidate B incorrectly lists Darvon instead of Darvocet.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:73
 
@@ -1284,7 +1253,6 @@ Review of Systems: The patient reports a persistent chest pain on the upper righ
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:74
 
 **Section:** History of Present Illness
@@ -1329,7 +1297,6 @@ The patient has had knee pain for 13 years, with symptoms including pain, snappi
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:76
 
 **Section:** Physical Examination
@@ -1362,7 +1329,6 @@ Physical Examination: No abnormalities noted. Normal male breast tissue.
 **Judge said:** Candidate A accurately captures the specific physical examination finding discussed in the conversation, whereas Candidate B is overly generic. / Candidate B accurately captures the specific physical exam finding of normal male breast tissue, whereas Candidate A is overly generic.
 
 LABEL: omitted fact
-
 
 ## Loss test1:77
 
@@ -1397,7 +1363,6 @@ Physical examination: The patient appears well-nourished and maintains a healthy
 **Judge said:** Candidate B accurately formats the doctor's visual assessment into a proper physical examination section, whereas Candidate A lacks physical exam formatting and details. / Candidate A provides a properly formatted Physical Examination note capturing the doctor's visual observations, whereas Candidate B only offers a vague general summary.
 
 LABEL: other
-
 
 ## Loss test1:78
 
@@ -1451,7 +1416,6 @@ Review of Systems:
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:83
 
 **Section:** Review of Systems
@@ -1488,7 +1452,6 @@ Review of Systems:
 
 LABEL: omitted fact
 
-
 ## Loss test1:84
 
 **Section:** Assessment
@@ -1523,7 +1486,6 @@ The patient reports feeling much better after the Prednisone, with the redness a
 **Judge said:** Candidate A captures all relevant clinical details regarding the patient's response to treatment for the wasp sting, whereas Candidate B omits the diagnosis entirely and provides an incomplete list. / Candidate B captures the full clinical context of the visit including the wasp sting and response to treatment, whereas Candidate A consists of incomplete fragments.
 
 LABEL: omitted fact
-
 
 ## Loss test1:88
 
@@ -1566,7 +1528,6 @@ Review of Systems: No reported gastrointestinal issues. No other symptoms noted.
 
 LABEL: omitted fact
 
-
 ## Loss test1:90
 
 **Section:** Other History
@@ -1606,7 +1567,6 @@ Other History: The patient has a history of a near-hospitalization due to a seve
 **Judge said:** Candidate B uses professional clinical language, whereas Candidate A features awkward and ungrammatical phrasing. / Candidate A uses professional clinical language and proper section header formatting, whereas Candidate B contains awkward phrasing and lacks a section header.
 
 LABEL: other
-
 
 ## Loss test1:91
 
@@ -1651,7 +1611,6 @@ Patient is 75 years old. Reports feeling very weak and shaky. Has been experienc
 
 LABEL: omitted fact
 
-
 ## Loss test1:93
 
 **Section:** Review of Systems
@@ -1688,7 +1647,6 @@ Review of Systems: No reported chest pain, shortness of breath, bleeding disorde
 **Judge said:** Candidate B is strictly faithful to the dialogue, while Candidate A inaccurately claims negatives for GI bleed and urinary tract bleed when the doctor only mentioned having GI and urinary tract reports. / Candidate A accurately captures the denied symptoms from the dialogue, whereas Candidate B assumes specific negative findings (GI bleed, urinary tract bleed) from a vague mention of GI and urinary tract reports.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:95
 
@@ -1764,7 +1722,6 @@ Patient is 85 years old, presenting with right buttock muscle pain radiating fro
 
 LABEL: format break
 
-
 ## Loss test1:97
 
 **Section:** Family and Social History
@@ -1803,7 +1760,6 @@ Family and Social History:
 
 LABEL: omitted fact
 
-
 ## Loss test1:98
 
 **Section:** History of Present Illness
@@ -1839,7 +1795,6 @@ Patient: Yes, I do have high blood pressure.
 **Judge said:** Candidate A is faithful to the dialogue, whereas Candidate B incorrectly states the patient has no history of hypertension despite the patient explicitly confirming they have high blood pressure. / Candidate A incorrectly states the patient has no history of hypertension despite the patient explicitly stating they do, whereas Candidate B contains no false information despite its extremely poor formatting and omissions.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:100
 
@@ -1890,7 +1845,6 @@ The patient's two-month-old infant is experiencing significant respiratory distr
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:102
 
 **Section:** Chief Complaint
@@ -1926,7 +1880,6 @@ Chief Complaint: A boil-like situation on the patient's buttocks.
 **Judge said:** Candidate B accurately and professionally captures the chief complaint, whereas Candidate A provides only a single word. / Candidate A accurately and professionally describes the patient's chief complaint, whereas Candidate B merely states a body part.
 
 LABEL: format break
-
 
 ## Loss test1:103
 
@@ -1973,7 +1926,6 @@ The patient reports experiencing a sensation of pressure in the back of their he
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:105
 
 **Section:** Other History
@@ -2008,7 +1960,6 @@ Other History: No change in social or medical conditions since the last visit.
 **Judge said:** Candidate A strictly adheres to the requested 'Other History' section, whereas Candidate B includes the reason for the visit, which belongs in the HPI. / Candidate B is more concise and strictly adheres to the requested section without redundantly adding the reason for visit.
 
 LABEL: wrong section
-
 
 ## Loss test1:110
 
@@ -2064,7 +2015,6 @@ The baby girl has a history of seizures, which have improved with Keppra solutio
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:112
 
 **Section:** Medications
@@ -2101,7 +2051,6 @@ Medications: Anxiety medication and estrogen.
 
 LABEL: other
 
-
 ## Loss test1:114
 
 **Section:** Family and Social History
@@ -2135,7 +2084,6 @@ Family and Social History:
 **Judge said:** Candidate B accurately captures the specific details about family heart history discussed in the conversation, whereas Candidate A is overly generic. / Candidate A accurately captures the specific detail discussed regarding family history of heart problems, whereas Candidate B uses a generic placeholder.
 
 LABEL: omitted fact
-
 
 ## Loss test1:115
 
@@ -2171,7 +2119,6 @@ Chief Complaint: Joint pain, with the onset of symptoms being a couple weeks ago
 **Judge said:** Candidate A is preferred because it provides more complete details regarding the joint pain, though both candidates omitted the patient's request for a routine checkup. / Candidate B is more complete by specifying the onset and widespread nature of the joint pain, despite both candidates omitting the routine checkup.
 
 LABEL: omitted fact
-
 
 ## Loss test1:116
 
@@ -2211,7 +2158,6 @@ Patient: No, I have not taken any prescribed drug for my headaches. When I get r
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:117
 
 **Section:** Gynaecological History
@@ -2244,7 +2190,6 @@ Gynaecological History: No previous pregnancies.
 **Judge said:** Candidate A accurately reflects that the patient has no previous pregnancies, whereas Candidate B incorrectly lists P1 for a patient currently pregnant with her first child. / Candidate B is faithful to the dialogue, whereas Candidate A incorrectly uses G1P1 to describe a current first pregnancy rather than G1P0.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:119
 
@@ -2287,7 +2232,6 @@ The patient has three children, all of whom are healthy and well. They live with
 
 LABEL: omitted fact
 
-
 ## Loss test1:121
 
 **Section:** Past Medical History
@@ -2320,7 +2264,6 @@ The patient discontinued taking Prevacid due to experiencing diarrhea.
 **Judge said:** Candidate A accurately captures both the discontinuation of Prevacid and the clinically relevant reason for stopping it, whereas Candidate B omits the side effect. / Candidate B captures the clinically relevant reason for discontinuing Prevacid (diarrhea), whereas Candidate A omits this key detail.
 
 LABEL: omitted fact
-
 
 ## Loss test1:122
 
@@ -2372,7 +2315,6 @@ The patient was changed from a P bag and was found to be empty.  The patient was
 
 LABEL: omitted fact
 
-
 ## Loss test1:123
 
 **Section:** Family and Social History
@@ -2410,7 +2352,6 @@ Family and Social History:
 
 LABEL: omitted fact
 
-
 ## Loss test1:124
 
 **Section:** Review of Systems
@@ -2445,7 +2386,6 @@ Review of Systems: None reported.
 **Judge said:** Candidate A is preferred because Candidate B incorrectly states the review of systems was unremarkable, whereas history could not actually be obtained due to the patient's condition. / Candidate B is preferable because claiming the review of systems was 'unremarkable' falsely implies a history was obtained, whereas history was actually unobtainable.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:125
 
@@ -2496,7 +2436,6 @@ The patient was diagnosed with serotonin syndrome, characterized by restlessness
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:126
 
 **Section:** History of Present Illness
@@ -2546,7 +2485,6 @@ Patient: Yes, I am concerned that I have been having small seizures again. I als
 
 LABEL: format break
 
-
 ## Loss test1:133
 
 **Section:** Family and Social History
@@ -2584,7 +2522,6 @@ Family and Social History:
 **Judge said:** Candidate A is well-formatted using concise bullet points, whereas Candidate B is slightly repetitive. / Candidate B is more concise and uses clear bulleting, avoiding the repetitive phrasing present in Candidate A.
 
 LABEL: other
-
 
 ## Loss test1:136
 
@@ -2641,7 +2578,6 @@ The patient's son is experiencing difficulties at school, including asking a lot
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:137
 
 **Section:** Chief Complaint
@@ -2679,7 +2615,6 @@ Chief Complaint: Heart disease follow-up after bypass surgery.
 **Judge said:** Candidate A provides specific and clinically relevant context regarding the follow-up visit, whereas Candidate B is excessively vague. / Candidate B provides a complete and clinically accurate chief complaint detailing the follow-up for heart disease after bypass surgery, whereas Candidate A is overly brief.
 
 LABEL: omitted fact
-
 
 ## Loss test1:141
 
@@ -2725,7 +2660,6 @@ Assessment: The patient has a history of accidental needle injury, resulting in 
 **Judge said:** Candidate B is written in a professional clinical format, whereas Candidate A is largely a copy-paste of dialogue quotes with added hallucinations. / Candidate A adopts a proper clinical note structure, whereas Candidate B merely pastes verbatim transcript dialogue into a numbered list.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:146
 
@@ -2773,7 +2707,6 @@ The patient sustained a fracture of both the bones in his forearm in September 2
 
 LABEL: format break
 
-
 ## Loss test1:148
 
 **Section:** History of Present Illness
@@ -2810,7 +2743,6 @@ The patient's two-week-old son is doing well overall, with the only concern bein
 **Judge said:** Candidate A accurately reflects the conversation, whereas Candidate B introduces an unmentioned diagnosis of phimosis and is repetitive. / Candidate B is accurate to the dialogue, whereas Candidate A falsely states the patient has a mild degree of phimosis when the exam was unremarkable.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:149
 
@@ -2854,7 +2786,6 @@ Family and Social History:
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:151
 
 **Section:** Past Surgical History
@@ -2891,7 +2822,6 @@ Surgical history: Disc surgery in the back approximately seven or eight years ag
 **Judge said:** Candidate B includes the specific details regarding the disc procedure and the timeframe mentioned in the conversation, whereas Candidate A omits them. / Candidate A is preferred because it includes clinically relevant details from the conversation, specifically that the back surgery was for a disc and occurred seven or eight years ago.
 
 LABEL: omitted fact
-
 
 ## Loss test1:157
 
@@ -2934,7 +2864,6 @@ Family and Social History:
 
 LABEL: omitted fact
 
-
 ## Loss test1:158
 
 **Section:** Imaging
@@ -2972,7 +2901,6 @@ Imaging: X-ray of the shoulder shows two views. No bone abnormalities or degener
 
 LABEL: omitted fact
 
-
 ## Loss test1:161
 
 **Section:** Past Medical History
@@ -3005,7 +2933,6 @@ Chronic issues: Recurrent tonsillitis requiring removal of the tonsils.
 **Judge said:** Candidate A completely captures both the history of recurrent tonsillitis and the surgical removal of the tonsils, while Candidate B omits the surgical intervention. / Candidate B is more complete because it captures both the recurrent tonsillitis and the surgical removal of the tonsils.
 
 LABEL: omitted fact
-
 
 ## Loss test1:163
 
@@ -3054,7 +2981,6 @@ Patient: I have pain in my hips, with the right side being more painful. It has 
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:164
 
 **Section:** History of Present Illness
@@ -3093,7 +3019,6 @@ The patient is a 53-year-old female with a history of a herniated disc at T8-T9.
 **Judge said:** Candidate A is slightly preferred because it explicitly mentions the specific conservative treatments attempted (anti-inflammatories and rest) rather than generalizing. / Both candidates are accurate and well-written, but Candidate B is slightly better for explicitly detailing the specific conservative measures tried (anti-inflammatory medications and rest).
 
 LABEL: omitted fact
-
 
 ## Loss test1:168
 
@@ -3148,7 +3073,6 @@ The patient has been on antibiotics for E. coli infection, with complications in
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:170
 
 **Section:** History of Present Illness
@@ -3198,7 +3122,6 @@ Patient: 37-year-old male, left-handed, presents with a history of headaches, na
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:173
 
 **Section:** Review of Systems
@@ -3241,7 +3164,6 @@ Review of Systems:
 **Judge said:** Candidate A accurately captures all reported symptoms including exertional shortness of breath, whereas Candidate B incorrectly states there is no shortness of breath and omits the bleeding history. / Candidate B is completely faithful to the dialogue, whereas Candidate A incorrectly states that the patient has no shortness of breath.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:174
 
@@ -3286,7 +3208,6 @@ Family and Social History:
 
 LABEL: omitted fact
 
-
 ## Loss test1:175
 
 **Section:** Allergies
@@ -3321,7 +3242,6 @@ Allergies: Cephalosporin antibiotics (cephalexin) are reported.
 **Judge said:** Candidate B correctly explicitly names cephalexin as mentioned in the dialogue, whereas Candidate A only mentions the general class. / Candidate A correctly identifies the specific allergen explicitly confirmed in the dialogue (cephalexin), whereas Candidate B only lists the drug class.
 
 LABEL: omitted fact
-
 
 ## Loss test1:176
 
@@ -3361,7 +3281,6 @@ Family and Social History:
 **Judge said:** Candidate A accurately captures the patient's past smoking history, whereas Candidate B omits this clinically relevant detail. / Candidate B accurately captures the patient's history of past cigarette smoking, whereas Candidate A omits this detail by simply labeling them a nonsmoker.
 
 LABEL: omitted fact
-
 
 ## Loss test1:177
 
@@ -3418,7 +3337,6 @@ The patient is a 55-year-old female with a history of a stroke. She has experien
 **Judge said:** Candidate A is far more faithful to the conversation, whereas Candidate B incorrectly claims the patient had improvement with VESIcare, tried a voiding diary, and had symptoms for several years. / Candidate B is preferred because Candidate A contains multiple severe inaccuracies that directly contradict the dialogue, such as stating that VESIcare provided improvement and that a voiding diary was completed.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:179
 
@@ -3481,7 +3399,6 @@ The patient identifies as White, has a history of HIV, and is currently being tr
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:181
 
 **Section:** Family and Social History
@@ -3527,7 +3444,6 @@ Family and Social History:
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:189
 
 **Section:** Medications
@@ -3562,7 +3478,6 @@ Medications: Synthroid for thyroid, Aspirin (stopped about a week ago), Terazosi
 **Judge said:** Candidate A accurately specifies which medications have been discontinued and when, whereas Candidate B misleadingly lists all medications together without indicating that most have been stopped. / Candidate B accurately specifies which medications were discontinued and when, whereas Candidate A misleadingly presents discontinued drugs as currently active medications.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:191
 
@@ -3607,7 +3522,6 @@ Family and Social History:
 
 LABEL: hallucinated fact
 
-
 ## Loss test1:192
 
 **Section:** Assessment
@@ -3647,7 +3561,6 @@ Assessment: The patient has been in good spirits and has high energy levels. She
 
 LABEL: omitted fact
 
-
 ## Loss test1:194
 
 **Section:** Family and Social History
@@ -3685,7 +3598,6 @@ Marital status: Divorced. Occupation: Homemaker. Smoking and alcohol use: Non-sm
 **Judge said:** Candidate A accurately captures the conversation without adding unmentioned details, whereas Candidate B asserts no illicit drug use even though it was never asked about in the dialogue. / Candidate B is completely faithful to the conversation, whereas Candidate A asserts no illicit drug use when drugs were never discussed.
 
 LABEL: hallucinated fact
-
 
 ## Loss test1:197
 

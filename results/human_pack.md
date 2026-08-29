@@ -5,7 +5,8 @@ clerical slips against the reason written at the time and were corrected by the 
 judgement was changed: `test1:4` scores typed without spaces (5555 / 5545); `test1:7` B scores
 typed as "12 3 4 4", corrected to 2 3 4 4; `test1:69` preference written as "Neither, same",
 corrected to tie; `test1:172` preference typed as B where the reason says A. `test1:108` B
-faithfulness corrected from 2 to 5 to match the reason.
+faithfulness corrected from 2 to 5 to match the reason. On 2026-08-30 the owner shortened the
+`test1:8` reason wording while preparing a screenshot; scores and preference unchanged.
 
 Score each side 1 to 5 per dimension, then a preference, before running the judge.
 Fill the SCORES line exactly: `SCORES: A f c fo co | B f c fo co | PREF: A|B|tie | REASON: ...`
@@ -144,7 +145,7 @@ Family and Social History:
 He is retired.  He is a social worker.  He is a smoker.  He is a social drinker.  He denies any illicit drug use.
 ```
 
-SCORES: A 5 3 5 5 | B 1 2 4 5 | PREF: A | REASON: Mainly due to failthfulness, B contains majorly incorrect facts, like being a amoker, and social worker (acutally works in social security administration)). Both contain omissions.
+SCORES: A 5 3 5 5 | B 1 2 4 5 | PREF: A | REASON: Mainly due to failthfulness, B contains majorly incorrect facts, like being a smoker. Both contain omissions.
 
 ## Pair test1:10
 

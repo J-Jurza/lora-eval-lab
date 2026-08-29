@@ -1,11 +1,55 @@
+# ---- Private writing and working notes: never public -----------------------
+# Owner's answers, article drafts, Medium copy, cover images, reading packs.
+notes/
+drafts/
+private/
+*.draft.md
+*.private.md
+
+# ---- Secrets and credentials -----------------------------------------------
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*token*
+*secret*
+credentials*.json
+service-account*.json
+
+# ---- Data and model artefacts (fetched or trained, never committed) ---------
 data/raw/
 data/cache/
 data/*.csv
 adapters/
+checkpoints/
+*.safetensors
+*.bin
+*.gguf
+
+# ---- Python ------------------------------------------------------------------
 .venv/
-.env
+venv/
 __pycache__/
+*.pyc
 *.egg-info/
 .pytest_cache/
-notes/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+
+# ---- Notebooks: outputs are stripped before commit; local checkpoints never --
+.ipynb_checkpoints/
+
+# ---- OS and editor -------------------------------------------------------------
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# ---- Screenshots and downloads that land in the tree by accident --------------
+Screenshot*.png
+*\ (1).*

@@ -1,35 +1,48 @@
 #!/usr/bin/env bash
-# PostToolUse hook for Edit|Write. Reads the tool call JSON on stdin, finds the edited
-# file, and rejects two things the house rules forbid but an LLM keeps producing:
-# em dashes in any text file, and lint errors in Python. Exit 2 sends the message back
-# to Claude as feedback so it fixes the file; exit 0 is silent.
+# PostToolUse hook for Edit|Write. Checks ONLY the lines the edit added (git diff against
+# HEAD; every line when the file is new or untracked): em dashes in any text file, ruff
+# findings in Python. Legacy lines never trigger it, so the surgical rule holds and an agent
+# is never pushed into rewriting a whole file. Exit 2 returns the message to Claude as
+# feedback; exit 0 is silent. Version 2026-08-30 (diff-aware).
 set -u
-
-file="$(python3 -c 'import sys, json
+python3 - <<'PY'
+import json, os, pathlib, re, shutil, subprocess, sys
 try:
-    print(json.load(sys.stdin).get("tool_input", {}).get("file_path", ""))
+    file = json.load(sys.stdin).get("tool_input", {}).get("file_path", "")
 except Exception:
-    print("")')"
-[ -n "$file" ] && [ -f "$file" ] || exit 0
+    sys.exit(0)
+if not file or not os.path.isfile(file): sys.exit(0)
+f = pathlib.Path(file).resolve()
+if f.suffix not in {".py", ".md", ".toml", ".yml", ".yaml", ".txt", ".json", ".ipynb"}: sys.exit(0)
 
-case "$file" in
-  *.py|*.md|*.toml|*.yml|*.yaml|*.txt|*.json|*.ipynb) ;;
-  *) exit 0 ;;
-esac
+def git(*a):
+    return subprocess.run(["git", "-C", str(f.parent), *a], capture_output=True, text=True)
+root = git("rev-parse", "--show-toplevel").stdout.strip()
+tracked = bool(root) and git("ls-files", "--error-unmatch", str(f)).returncode == 0
+lines = open(f, errors="ignore").read().split("\n")
+if tracked:
+    added = set()
+    for m in re.finditer(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@", git("diff", "-U0", "HEAD", "--", str(f)).stdout, re.M):
+        start, count = int(m.group(1)), int(m.group(2)) if m.group(2) is not None else 1
+        added.update(range(start, start + count))
+else:
+    added = set(range(1, len(lines) + 1))
+if not added: sys.exit(0)
 
-# U+2014 em dash. Notebooks are generated, but the builder's strings end up in them too.
-if grep -n $'\xe2\x80\x94' "$file" >/dev/null 2>&1; then
-  echo "style-guard: em dash found in $file. House rule: use a colon, a comma, or two sentences." >&2
-  grep -n $'\xe2\x80\x94' "$file" | head -5 >&2
-  exit 2
-fi
-
-if [[ "$file" == *.py ]]; then
-  ruff=""
-  if [ -x "${CLAUDE_PROJECT_DIR:-.}/.venv/bin/ruff" ]; then ruff="${CLAUDE_PROJECT_DIR:-.}/.venv/bin/ruff"
-  elif command -v ruff >/dev/null 2>&1; then ruff="ruff"; fi
-  if [ -n "$ruff" ]; then
-    out="$("$ruff" check --quiet "$file" 2>&1)" || { echo "style-guard: ruff check failed for $file" >&2; echo "$out" >&2; exit 2; }
-  fi
-fi
-exit 0
+problems = []
+for n in sorted(added):
+    if n <= len(lines) and "—" in lines[n - 1]:
+        problems.append(f"{f.name}:{n}: em dash. House rule: a colon, a comma, or two sentences.")
+if f.suffix == ".py":
+    ruff = shutil.which("ruff") or next((str(p) for p in [pathlib.Path(root or ".") / ".venv/bin/ruff"] if p.exists()), None)
+    if ruff:
+        out = subprocess.run([ruff, "check", "--output-format=concise", str(f)], capture_output=True, text=True).stdout
+        for line in out.splitlines():
+            m = re.match(r"^(.*?):(\d+):\d+: (.*)$", line)
+            if m and int(m.group(2)) in added:
+                problems.append(f"{f.name}:{m.group(2)}: ruff {m.group(3)}")
+if problems:
+    print("style-guard (added lines only):", file=sys.stderr)
+    for p in problems[:8]: print("  " + p, file=sys.stderr)
+    sys.exit(2)
+PY

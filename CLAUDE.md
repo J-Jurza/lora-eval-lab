@@ -24,3 +24,16 @@ real but the honesty and explain-every-step rules do not relax.
 Vault context for the human side of this project:
 `Work/Career/Job Search 2026-08/Strategy/58 - Learning Path (Projects, Courses, Profile Updates).md`
 (Project 1) and `Work/Career/Job Search 2026-08/Strategy/43 - Game Plan (2026-08-26).md` section 6.
+
+## Working rules
+
+<!-- four-rules: the Karpathy preamble, identical in every repo. Change it in agent-skills, never here. -->
+- **Think before coding.** State assumptions; when a request has two readings, ask and propose the one you would pick. Name a simpler approach when you see one. Never code through confusion.
+- **Simplicity first.** The minimum code that solves the problem: no speculative abstraction, configurability, or error handling for cases that cannot happen. If 200 lines could be 50, rewrite.
+- **Surgical changes.** Every changed line traces to the request. Match the existing style, leave adjacent code alone, mention dead code rather than deleting it, and remove only the orphans your own change created.
+- **Goal-driven execution.** Turn the task into a check before starting: "fix the bug" is "write the failing test, then make it pass". Multi-step work gets a short plan with a verification per step.
+- **Self-check**: fewer unnecessary diff lines, fewer rewrites, questions before mistakes.
+
+## Knowledge base
+
+The Obsidian dev vault at `/Users/honzik/code/obsidian-dev-vault/coding_projects/` is the hub this repo hangs off. When a task needs background (a book, a paper, a technique, a decision made in another project), read `Wiki/_Meta/index.md` there first, then the doc it points to, and cite vault docs by path. This repo's vault-side notes are `Projects/lora-eval-lab/`: `CONTEXT.md` and `DECISIONS.md` are agent-maintained, `ideas.md` and `research.md` are the owner's. The vault is readable from here through `additionalDirectories` in `.claude/settings.local.json`; never edit it from this repo. Hand learnings worth keeping to the vault agent for `Wiki/3. Project Knowledge/`.

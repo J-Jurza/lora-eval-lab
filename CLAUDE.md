@@ -58,6 +58,7 @@ python tools/make_figures.py                       # docs/figures/ from results/
 - Read `CONTEXT.md`, then this file, then only what the task needs. `grep -n` and `git diff --stat` before reading whole files. Never dump `results/`, `data/`, notebook outputs or logs into the conversation.
 - Do not re-read an unchanged file. Delegate broad searches to a subagent and keep the conclusion, not the listing.
 - Replies: no preamble, no restating the plan. What was done, what was not, numbers verbatim. Prose longer than a paragraph goes in a file, not the chat.
+- When compacting, preserve the list of modified files, the test command, and any open decision.
 
 ## Mechanics you will otherwise get wrong
 
@@ -94,6 +95,7 @@ Binding, not advisory. Skills are model-invoked; this table says when.
 | A notebook was edited, before its commit | `nb-pass` (style, annotate, structure; `--checks` adds `nb-check`) |
 | README, docs or article prose written or changed, before showing it | `wr-unslop` audit; `wr-skimproof` first for anything published |
 | A `.docx` deliverable | `word-style` |
+| Before reporting a code change done | `verify`: tests, diff read, no test weakened, evidence in the reply |
 | Before a milestone commit | `qa-audit`, then `qa-respond` |
 | Docs drifted from code | `docs-audit` |
 | Repo feels heavy or stale, or monthly | `repo-lint` |
@@ -108,11 +110,12 @@ Binding, not advisory. Skills are model-invoked; this table says when.
 
 ## Definition of done for a change
 
-1. Tests pass (`pytest -q`), including any new pure logic pinned by hand-computed values.
+1. `verify` ran: tests pass (`pytest -q`, including any new pure logic pinned by hand-computed values. The diff was read and no test was weakened; the command and its output are in the reply, a summary is not evidence.
 2. Results regenerated if anything upstream of them changed.
 3. DECISIONS / CHANGELOG / CONTEXT updated per the rules above.
 4. No em dashes; `ruff check` clean on every file touched.
 
-## Knowledge base
+## Personal context
 
-The Obsidian dev vault at `/Users/honzik/code/obsidian-dev-vault/coding_projects/` is the hub this repo hangs off. When a task needs background (a book, a paper, a technique, a decision made in another project), read `Wiki/_Meta/index.md` there first, then the doc it points to, and cite vault docs by path. This repo's vault-side notes are `Projects/lora-eval-lab/`: `CONTEXT.md` and `DECISIONS.md` are agent-maintained, `ideas.md` and `research.md` are the owner's. The vault is readable from here through `additionalDirectories` in `.claude/settings.local.json`; never edit it from this repo. Hand learnings worth keeping to the vault agent for `Wiki/3. Project Knowledge/`.
+Machine paths, the owner's knowledge-base vault and personal notes for this repo live in
+`CLAUDE.local.md`, git-ignored and loaded alongside this file. Never add a local path here.

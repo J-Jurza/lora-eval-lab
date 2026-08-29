@@ -49,6 +49,8 @@ Thumbs.db
 .vscode/
 *.swp
 *~
+# Machine-specific Claude Code settings (vault path); settings.json is the shared one
+.claude/settings.local.json
 
 # ---- Screenshots and downloads that land in the tree by accident --------------
 Screenshot*.png

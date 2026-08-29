@@ -90,9 +90,9 @@ Read together with the dimension table: the fine-tune traded faithfulness and co
 for the dataset's terse register, and the register did not win format points because the
 base model already produced acceptable sections. Labelling provenance: labelled by the
 implementing agent (Claude, a different model from the Gemini judge) from the dialogue,
-both outputs and the judge's reasons; the author audits a seeded random 15 and the
-agreement rate is reported here when done. Until then treat the counts as indicative and
-the two big categories as robust.
+both outputs and the judge's reasons; the author audited a seeded random 15 blind to the
+labels and agreed on 14 of the 14 answered (one pair, `test1:15`, unanswered). The two
+big categories are robust; the small ones are one reader's call.
 
 **What this does and does not show.** It shows that 1,200 examples of QLoRA on this dataset
 made a 1.5B instruct model less faithful to the conversation, as judged blind by one LLM

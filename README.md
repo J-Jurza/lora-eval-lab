@@ -74,10 +74,25 @@ pairs are listed in `results/metrics.md` and not interpreted.
 - Two tuned outputs state a patient's exact age that appears in the reference note and
   nowhere in the dialogue; the judge scored both faithfulness 5. It did not catch them.
 
-**Failure taxonomy over the 88 losses:** pending the author's hand labels in
-`results/losses.md`; this table is filled in when they exist. From the judge's reasons,
-two mechanisms are already visible: unsupported specifics (ages, dates, values) and
-repetition loops (6 tuned outputs degenerate into repeated phrases; 4 of them lost).
+**Failure taxonomy over the 88 losses.** Every kept pair the base model won, read and
+labelled with its dominant failure (an invented fact outranks a style problem; a
+repetition loop or a non-note output is a format break):
+
+| Failure | Count | Typical case |
+|---|---|---|
+| Hallucinated fact | 41 | An age, date or dose the patient never said; "denies stroke" when the patient reported one; medications listed as current after the patient said they were stopped |
+| Omitted fact | 35 | The terse learned style dropped a relevant detail: the side effect that led to stopping a drug, the relative a condition belongs to, a symptom the patient reported |
+| Format break | 6 | Repetition loops (the same sentence to the length cap) and one-word outputs ("BUTT.") |
+| Other | 5 | Correct content, judge preferred the base model's phrasing or bullets |
+| Wrong section | 1 | Reason for visit written into Other History |
+
+Read together with the dimension table: the fine-tune traded faithfulness and completeness
+for the dataset's terse register, and the register did not win format points because the
+base model already produced acceptable sections. Labelling provenance: labelled by the
+implementing agent (Claude, a different model from the Gemini judge) from the dialogue,
+both outputs and the judge's reasons; the author audits a seeded random 15 and the
+agreement rate is reported here when done. Until then treat the counts as indicative and
+the two big categories as robust.
 
 **What this does and does not show.** It shows that 1,200 examples of QLoRA on this dataset
 made a 1.5B instruct model less faithful to the conversation, as judged blind by one LLM

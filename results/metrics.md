@@ -43,12 +43,12 @@ ROUGE-L F1 against the reference: base 0.183, tuned 0.282. ROUGE rewards overlap
 
 Human vs judge on 29 kept pairs: raw agreement 0.69, Cohen's kappa 0.41.
 
-Failure taxonomy over losses (0/88 labelled):
+Failure taxonomy over losses (88/88 labelled):
 
 | Failure | Count |
 |---|---|
-| hallucinated fact | 0 |
-| omitted fact | 0 |
-| wrong section | 0 |
-| format break | 0 |
-| other | 0 |
+| hallucinated fact | 41 |
+| omitted fact | 35 |
+| wrong section | 1 |
+| format break | 6 |
+| other | 5 |

@@ -90,9 +90,10 @@ agreement rate you saw.
 - Per-dimension mean scores, base vs tuned.
 - ROUGE-L as a sanity check only, with the sentence "ROUGE rewards overlap, not
   correctness" next to it.
-- **Failure taxonomy:** every pair the tuned model *lost*, hand-labelled: hallucinated fact,
+- **Failure taxonomy:** every pair the tuned model *lost*, labelled: hallucinated fact,
   omitted fact, wrong section, format break, other. This table is the most useful thing in
-  the repo, because it says what fine-tuning broke.
+  the repo, because it says what fine-tuning broke. What happened: the agent labelled all 88
+  with stated provenance and the owner audits a seeded random 15 (see `DECISIONS.md`).
 
 ## 7. Write it up
 

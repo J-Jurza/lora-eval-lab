@@ -105,3 +105,9 @@ One entry per choice that shapes the result. Git log says what changed; this say
 
 ## 2026-08-30: Correction to the memorised-specifics count
 **What happened:** The 2026-08-28 entry reported 7 held-out rows where the tuned model states an age absent from the dialogue. That check only tested the first number-word found in the dialogue; a stricter check (any number-word whose tens digit matches) finds 2 such rows. The judge scored both faithfulness 5, so it did not catch them either. The earlier entry stands as written; this one supersedes its count.
+
+## 2026-08-30: Failure taxonomy labelled by the agent, audited by the owner
+**Context:** PROCESS.md planned hand labelling by the owner. Eighty-eight losses is about an hour of careful reading, and the owner's time this weekend went to the blind pass and to another project.
+**Decision:** The implementing agent (Claude) labelled all 88 from the dialogue, both outputs and the judge's two reasons, with one dominant label per pair; provenance is stated at the top of `results/losses.md` and in the README. The owner audits a seeded random sample of 15 (`notes/audit_sample.json`) and the agreement rate is published. Below 12 of 15 agreement the table is downgraded to "indicative" in the README and the owner relabels the disputed categories.
+**Alternatives rejected:** Asking the judge to label its own losses (a second unvalidated opinion from the instrument under test); leaving the table empty (the most useful table in the repo would be missing); the owner labelling all 88 later (the write-up would wait on it for no gain in rigour over an audited sample).
+**Consequences:** The labels are one reader's, and not a clinician's, stated as such.

@@ -189,6 +189,12 @@
   "tie": 0.03333333333333333,
   "n": 30
  },
- "taxonomy": {},
- "losses_labelled": "0/88"
+ "taxonomy": {
+  "omitted fact": 35,
+  "hallucinated fact": 41,
+  "other": 5,
+  "format break": 6,
+  "wrong section": 1
+ },
+ "losses_labelled": "88/88"
 }

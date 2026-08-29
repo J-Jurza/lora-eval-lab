@@ -5,10 +5,12 @@
 # is never pushed into rewriting a whole file. Exit 2 returns the message to Claude as
 # feedback; exit 0 is silent. Version 2026-08-30 (diff-aware).
 set -u
+PAYLOAD="$(cat)"
+export PAYLOAD
 python3 - <<'PY'
 import json, os, pathlib, re, shutil, subprocess, sys
 try:
-    file = json.load(sys.stdin).get("tool_input", {}).get("file_path", "")
+    file = json.loads(os.environ.get("PAYLOAD", "")).get("tool_input", {}).get("file_path", "")
 except Exception:
     sys.exit(0)
 if not file or not os.path.isfile(file): sys.exit(0)

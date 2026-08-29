@@ -360,11 +360,16 @@ def main() -> None:
     ap.add_argument("--judge", action="store_true", help="run the LLM judge")
     ap.add_argument("--model", default=DEFAULT_JUDGE)
     ap.add_argument("--limit", type=int, default=None, help="judge only the first N pairs")
+    ap.add_argument("--force", action="store_true", help="overwrite an existing human pack")
     args = ap.parse_args()
 
     pairs, key = load_everything()
     print(f"{len(pairs)} pairs, key at {KEY_PATH}")
     if args.human:
+        if HUMAN_PACK_PATH.exists() and not args.force:
+            raise SystemExit(
+                f"{HUMAN_PACK_PATH} exists and may hold filled-in scores; pass --force to overwrite"
+            )
         ids = choose_human_ids([p["id"] for p in pairs])
         HUMAN_PACK_PATH.write_text(human_pack(pairs, key, ids))
         print(f"human pack: {len(ids)} pairs at {HUMAN_PACK_PATH}")

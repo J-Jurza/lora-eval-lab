@@ -16,7 +16,6 @@ import json
 import random
 import re
 from collections import Counter, defaultdict
-from pathlib import Path
 
 from lora_eval_lab import data, judge
 
@@ -367,12 +366,15 @@ def render(m: dict) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--taxonomy", action="store_true", help="write results/losses.md for hand labelling")
+    ap.add_argument("--force", action="store_true", help="overwrite an existing losses pack")
     args = ap.parse_args()
 
     pairs, key = judge.load_everything()
     verdicts = judge.read_jsonl(judge.VERDICTS_PATH)
     kept, _ = consensus(verdicts)
     if args.taxonomy:
+        if LOSSES_PATH.exists() and not args.force:
+            raise SystemExit(f"{LOSSES_PATH} exists and may hold labels; pass --force to overwrite")
         LOSSES_PATH.write_text(losses_pack(pairs, kept, verdicts))
         print(f"losses pack at {LOSSES_PATH}")
         return

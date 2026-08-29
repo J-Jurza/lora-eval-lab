@@ -60,9 +60,12 @@ fig.tight_layout(); fig.savefig(OUT / "fig3_taxonomy.png"); plt.close(fig)
 # 4. Blind judging loop diagram (boxes, no mermaid CLI available)
 fig, ax = plt.subplots(figsize=(10, 4.8), dpi=200); ax.set_xlim(0, 10); ax.set_ylim(0, 5); ax.axis("off")
 def box(x, y, w, h, text, fc="#f4f4f4", ec=INK):
+    """Rounded labelled box at (x, y) with width w and height h."""
     ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.02,rounding_size=0.12", fc=fc, ec=ec, lw=1.4))
     ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=11, color=INK)
-def arrow(x1, y1, x2, y2): ax.annotate("", xy=(x2, y2), xytext=(x1, y1), arrowprops=dict(arrowstyle="->", color=INK, lw=1.3))
+def arrow(x1, y1, x2, y2):
+    """Straight arrow from (x1, y1) to (x2, y2)."""
+    ax.annotate("", xy=(x2, y2), xytext=(x1, y1), arrowprops=dict(arrowstyle="->", color=INK, lw=1.3))
 box(0.2, 3.3, 2.2, 1.2, "194 sealed exam\nconversations")
 box(3.0, 4.0, 2.0, 0.8, "base note", fc="#e3ebf5"); box(3.0, 2.6, 2.0, 0.8, "tuned note", fc="#fbe9d6")
 arrow(2.4, 4.1, 3.0, 4.4); arrow(2.4, 3.7, 3.0, 3.0)

@@ -136,9 +136,9 @@ The two GPU steps run in one Colab notebook, `notebooks/lora_eval_lab_colab.ipyn
 
 ```bash
 pip install -e ".[judge]"
-python -m lora_eval_lab.judge --human      # write the 30-pair human pack, score it first
+python -m lora_eval_lab.judge --human      # write the 30-pair human pack, score it first (refuses to overwrite a filled one)
 python -m lora_eval_lab.judge --judge      # LLM judge, twice per pair, resumable
-python -m lora_eval_lab.evaluate --taxonomy   # write losses.md, label every loss by hand
+python -m lora_eval_lab.evaluate --taxonomy   # write losses.md, label every loss by hand (refuses to overwrite a labelled one)
 python -m lora_eval_lab.evaluate           # metrics.md
 ```
 

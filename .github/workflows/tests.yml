@@ -3,6 +3,8 @@ on:
   push:
     paths: ["src/**", "tests/**", "pyproject.toml", ".github/workflows/tests.yml"]
   pull_request:
+permissions:
+  contents: read
 jobs:
   pytest:
     runs-on: ubuntu-latest

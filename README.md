@@ -11,7 +11,7 @@ evaluation is the deliverable; the model is the excuse to build it. Companion to
 [rag-eval-lab](https://github.com/J-Jurza/rag-eval-lab).
 
 - **Write-up:** [Did your fine-tune actually get better? The metric you trust cannot tell you](https://medium.com/@honzj/did-your-fine-tune-actually-get-better-the-metric-you-trust-cannot-tell-you-a980f91c7266) (Medium, 5 min)
-- **Walkthrough:** [WALKTHROUGH.md](WALKTHROUGH.md), every step in full, three depths of explanation, the numbers, and where each piece lives in the code
+- **Walkthrough:** [WALKTHROUGH.md](WALKTHROUGH.md), the full method: every step, the numbers, the code, and the reproduce commands
 - **Process and decisions:** [PROCESS.md](PROCESS.md) (the steps in plain language), [DECISIONS.md](DECISIONS.md) (every choice, with the alternative rejected)
 
 ## Result

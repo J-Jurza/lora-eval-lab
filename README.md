@@ -11,7 +11,7 @@ evaluation is the deliverable; the model is the excuse to build it. Companion to
 [rag-eval-lab](https://github.com/J-Jurza/rag-eval-lab).
 
 - **Write-up:** [Did your fine-tune actually get better? The metric you trust cannot tell you](https://medium.com/@honzj/did-your-fine-tune-actually-get-better-the-metric-you-trust-cannot-tell-you-a980f91c7266) (Medium, 5 min)
-- **Walkthrough:** [docs/walkthrough.md](docs/walkthrough.md), every step in full, three depths of explanation, the numbers, and where each piece lives in the code
+- **Walkthrough:** [WALKTHROUGH.md](WALKTHROUGH.md), every step in full, three depths of explanation, the numbers, and where each piece lives in the code
 - **Process and decisions:** [PROCESS.md](PROCESS.md) (the steps in plain language), [DECISIONS.md](DECISIONS.md) (every choice, with the alternative rejected)
 
 ## Result
@@ -37,7 +37,7 @@ left a relevant fact out. The cause is in the data: the reference notes were wri
 before the conversations and contain specifics the conversations lack, so training on
 them rewards invention. Full tables, per-section rates, the judge's position-bias count,
 human-judge agreement (kappa 0.41) and the taxonomy are in
-[results/metrics.md](results/metrics.md) and [docs/walkthrough.md](docs/walkthrough.md).
+[results/metrics.md](results/metrics.md) and [WALKTHROUGH.md](WALKTHROUGH.md).
 
 ![Training and validation loss over 300 steps](docs/figures/fig2_loss_curve.png)
 
@@ -100,7 +100,8 @@ notebooks/      the Colab notebook for the two GPU steps
 results/        generations, key, verdicts, human pack, losses, metrics (committed)
 tests/          40 tests with hand-computed expected values
 tools/          make_figures.py, the charts from results/
-docs/           walkthrough.md and the figures
+docs/           the figures
+WALKTHROUGH.md  every step in full, the long-form companion to the write-up
 ```
 
 ## Design decisions

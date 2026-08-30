@@ -6,11 +6,11 @@ project was built, one section per step of `PROCESS.md`, so that the person whos
 on the repo could explain every step without notes. It is published for the same reason:
 so that a reader can.
 
-Each section has the same shape. A three-sentence summary, a table of the terms it uses,
-a diagram where the mechanism has parts, three depths of explanation (a twelve-year-old's
-analogy, a first-year student's mechanism, a practitioner's card), the common confusion,
-where it lives in the repo, questions to check yourself against (answers folded), the
-numbers to remember, and what to read next. Skip the depths you do not need.
+Each section has the same shape: a three-sentence summary, the terms it uses, a diagram
+where the mechanism has parts, the mechanism in plain words with the real numbers, a
+practitioner's card (when to use it, how, how it goes wrong), the common confusion, a
+command to try, where it lives in the code, questions to check yourself against with the
+answers folded, the numbers to remember, and references. A glossary closes the document.
 
 Numbers are from the committed results (`results/metrics.md`, `results/train_config.json`,
 `eval/holdout_ids.json`) and can be regenerated with the commands in the README.
@@ -84,11 +84,8 @@ flowchart TD
     C2 -->|"short identical boilerplate,<br/>24 rows"| K["keep: the correct answer,<br/>not leakage"]
 ```
 
-> [!TIP]
-> **🧒 Explain like I'm 12.** Before a test, the teacher seals the exam questions in an envelope so nobody studies them. If a question also turned up in the homework, the student would be remembering, not thinking, and the mark would mean nothing. We sealed 194 conversations before training, checked that none of them had sneaked into the homework, and found six that had. Those six are out, and the envelope's list is on the record.
-
 > [!NOTE]
-> **🧑‍🎓 Explain like I'm 18.** MTS-Dialog (Ben Abacha et al. 2023) is 1,701 short doctor-patient conversations, each with a **section name** (20 types such as History of Present Illness or Allergies) and the **reference note**, the section text a clinician originally wrote. The notes came first, from the public MTSamples collection, and the conversations were written afterwards to match them.
+> **🧑‍🎓 The mechanism.** MTS-Dialog (Ben Abacha et al. 2023) is 1,701 short doctor-patient conversations, each with a **section name** (20 types such as History of Present Illness or Allergies) and the **reference note**, the section text a clinician originally wrote. The notes came first, from the public MTSamples collection, and the conversations were written afterwards to match them.
 >
 > The dataset ships an official split. We used it and froze the 200 test ids before training. Two leakage checks then ran on text, not ids. The first compares normalised dialogue text across splits and found one copy. The second compares reference notes, because the same source note can sit behind two different conversations, and found four exact matches and one near match. Twenty-four short identical notes such as "No known drug allergies" were kept, because identical boilerplate is the right answer, not a leak.
 >
@@ -97,7 +94,7 @@ flowchart TD
 > The trade-off: the note-level check was added after training, when the first tuned output read stated a date that was in the reference and nowhere in the conversation. The removal happened before any verdict existed and is recorded in `DECISIONS.md`. A cleaner project would have run both checks first.
 
 > [!IMPORTANT]
-> **🧑‍💻 Explain like I'm a practitioner.** Contamination is the commonest silent error in fine-tuning write-ups. Check inputs and targets separately: an input check catches copied prompts, a target check catches shared source documents behind different prompts. Normalise text (case, whitespace) before comparing, use exact match plus a token-overlap threshold (Jaccard 0.8 here) for near-duplicates, and exempt short boilerplate by length. Record every dropped id in the frozen file so a reader can open each one. Pin the dataset to a commit and checksum the files.
+> **🧑‍💻 In practice.** Contamination is the commonest silent error in fine-tuning write-ups. Check inputs and targets separately: an input check catches copied prompts, a target check catches shared source documents behind different prompts. Normalise text (case, whitespace) before comparing, use exact match plus a token-overlap threshold (Jaccard 0.8 here) for near-duplicates, and exempt short boilerplate by length. Record every dropped id in the frozen file so a reader can open each one. Pin the dataset to a commit and checksum the files.
 >
 > How it goes wrong: checking ids when ids restart per file (they do here, so ids carry the split name); checking only inputs; deleting contaminated rows from the training side after training (you cannot untrain, so the exclusion goes on the evaluation side and is stated).
 
@@ -112,26 +109,25 @@ python -m lora_eval_lab.data --download --stats   # train 1201, valid 98 (after 
 
 **In this repo.** `src/lora_eval_lab/data.py`: `cross_split_duplicates`, `cross_split_note_duplicates`, `build_holdout`, `download` (checksums), `format_example`. Frozen ids and dropped ids: `eval/holdout_ids.json`. Tests: `tests/test_data.py`.
 
-> [!NOTE]
-> **Check yourself.**
->
-> <details><summary><i>How many examples in each split, how the split was made, what the duplicate check found, and why leakage between splits matters?</i></summary>
->
-> Train 1,201, validation 98, held-out 194, from the dataset's official split. One held-out dialogue was word-for-word in train and five held-out reference notes came from encounters also in train; all six are out. A model that has met the exam material is recalling, not being tested.
->
-> </details>
->
-> <details><summary><i>Why pin the source to a commit with checksums rather than download the latest?</i></summary>
->
-> So the numbers are reproducible: a changed upstream file fails the checksum instead of silently changing the exam.
->
-> </details>
->
-> <details><summary><i>What are the three parts of one training example, and why is the section name in there?</i></summary>
->
-> System instruction, user turn with the section name and the conversation, assistant turn with the reference note. The same conversation can yield different sections, so the model has to be told which one to write.
->
-> </details>
+**Check yourself.**
+
+<details><summary><i>How many examples in each split, how the split was made, what the duplicate check found, and why leakage between splits matters?</i></summary>
+
+Train 1,201, validation 98, held-out 194, from the dataset's official split. One held-out dialogue was word-for-word in train and five held-out reference notes came from encounters also in train; all six are out. A model that has met the exam material is recalling, not being tested.
+
+</details>
+
+<details><summary><i>Why pin the source to a commit with checksums rather than download the latest?</i></summary>
+
+So the numbers are reproducible: a changed upstream file fails the checksum instead of silently changing the exam.
+
+</details>
+
+<details><summary><i>What are the three parts of one training example, and why is the section name in there?</i></summary>
+
+System instruction, user turn with the section name and the conversation, assistant turn with the reference note. The same conversation can yield different sections, so the model has to be told which one to write.
+
+</details>
 
 > [!WARNING]
 > **Numbers to remember.**
@@ -162,18 +158,15 @@ python -m lora_eval_lab.data --download --stats   # train 1201, valid 98 (after 
 | **Prompt fingerprint** | A hash of the exact messages sent, stored per row | `prompt_sha256`, 16 hex chars |
 | **Length cap** | Hard stop on output length | `max_new_tokens=320` |
 
-> [!TIP]
-> **🧒 Explain like I'm 12.** To know whether training helped, you need the "before" photo taken with the same camera, same light, same pose as the "after". So the base model sat the exam first, and we wrote down the exact settings so the tuned model got the same ones. And we turned off the dice: the model always picks its single best next word, so running it again gives the same answer and anyone can check.
-
 > [!NOTE]
-> **🧑‍🎓 Explain like I'm 18.** A language model produces, at each step, a probability for every token in its vocabulary, and a **decoding** rule picks one. **Greedy** takes the most probable token every time, so the same prompt yields the same output on every run. **Sampling** draws at random in proportion to the probabilities and yields a different output each run.
+> **🧑‍🎓 The mechanism.** A language model produces, at each step, a probability for every token in its vocabulary, and a **decoding** rule picks one. **Greedy** takes the most probable token every time, so the same prompt yields the same output on every run. **Sampling** draws at random in proportion to the probabilities and yields a different output each run.
 >
 > With 194 pairs and one output each, sampling would add a random draw per pair, noise on top of a small sample. Greedy removes it and makes the committed outputs checkable. The cost is style: greedy can be blunt or repetitive, and it is not how a product serves a model. Both models pay it equally.
 >
 > The control is produced first so that nobody can adjust the prompt after seeing the tuned outputs. The fingerprint enforces the other half: if the template differs between the base and tuned files for the same id, `judge.build_pairs` refuses to pair them.
 
 > [!IMPORTANT]
-> **🧑‍💻 Explain like I'm a practitioner.** Fix the decoding for a comparison: greedy or a fixed seed, identical `max_new_tokens`, identical template, recorded in every output row rather than in a README. Hash the rendered messages and store the hash with the output; compare hashes when pairing. Generate the control before training and commit it. Set the length cap from the reference length distribution (the 95th percentile of reference notes here is 150 words, so 320 tokens covers all but runaway outputs, which is a failure you want to see).
+> **🧑‍💻 In practice.** Fix the decoding for a comparison: greedy or a fixed seed, identical `max_new_tokens`, identical template, recorded in every output row rather than in a README. Hash the rendered messages and store the hash with the output; compare hashes when pairing. Generate the control before training and commit it. Set the length cap from the reference length distribution (the 95th percentile of reference notes here is 150 words, so 320 tokens covers all but runaway outputs, which is a failure you want to see).
 >
 > How it goes wrong: sampling at temperature 0.7 on a 200-pair comparison, then reporting a win rate that moves several points between reruns; a "small prompt fix" applied to one side only; outputs regenerated after the judge has run.
 
@@ -188,26 +181,25 @@ python -m lora_eval_lab.generate --tag base --limit 2 --out /tmp/smoke.jsonl   #
 
 **In this repo.** `src/lora_eval_lab/generate.py`: `build_messages`, `prompt_hash`, `DECODING`, `run`. The pairing check: `judge.build_pairs`.
 
-> [!NOTE]
-> **Check yourself.**
->
-> <details><summary><i>Why does the base model generate over the held-out set before any training, and what would go wrong if we did it afterwards with a "slightly improved" prompt?</i></summary>
->
-> It is the control; a prompt changed after seeing tuned outputs makes the comparison unfair in a direction nobody can see.
->
-> </details>
->
-> <details><summary><i>What does greedy decoding mean, and why use it for both models rather than sampling?</i></summary>
->
-> Always take the most likely next token; deterministic, so no sampling noise on a small set and the committed outputs can be checked.
->
-> </details>
->
-> <details><summary><i>Each output row stores a fingerprint of the prompt. What problem does that catch?</i></summary>
->
-> The prompt template changing between the base run and the tuned run.
->
-> </details>
+**Check yourself.**
+
+<details><summary><i>Why does the base model generate over the held-out set before any training, and what would go wrong if we did it afterwards with a "slightly improved" prompt?</i></summary>
+
+It is the control; a prompt changed after seeing tuned outputs makes the comparison unfair in a direction nobody can see.
+
+</details>
+
+<details><summary><i>What does greedy decoding mean, and why use it for both models rather than sampling?</i></summary>
+
+Always take the most likely next token; deterministic, so no sampling noise on a small set and the committed outputs can be checked.
+
+</details>
+
+<details><summary><i>Each output row stores a fingerprint of the prompt. What problem does that catch?</i></summary>
+
+The prompt template changing between the base run and the tuned run.
+
+</details>
 
 > [!WARNING]
 > **Numbers to remember.**
@@ -249,11 +241,8 @@ flowchart LR
     style B fill:#fde3d6,stroke:#eb6834
 ```
 
-> [!TIP]
-> **🧒 Explain like I'm 12.** A language model is a huge grid of numbers. Teaching it a new habit by changing all of them needs a machine most people do not have and produces a file as big as the model. LoRA bolts a small extra part onto the model and trains only that. The original stays untouched, so it keeps everything it knew, and the extra part is about one percent of the size. Swap the part and you have a different specialist.
-
 > [!NOTE]
-> **🧑‍🎓 Explain like I'm 18.** Take one of the model's weight grids, say 1,536 by 1,536 (2.4 million numbers). Full fine-tuning nudges all of them. LoRA freezes the grid and adds the product of two thin strips, 1,536 by 16 and 16 by 1,536: 49,000 trainable numbers, about 2%. The 16 is the **rank**, how many directions of change the strips can express. Strips go on seven grids per layer across 28 layers: 196 pairs, 18.5 million numbers, 1.18% of the model. Only those learn. Saved to disk they are the **adapter**, about 70 MB.
+> **🧑‍🎓 The mechanism.** Take one of the model's weight grids, say 1,536 by 1,536 (2.4 million numbers). Full fine-tuning nudges all of them. LoRA freezes the grid and adds the product of two thin strips, 1,536 by 16 and 16 by 1,536: 49,000 trainable numbers, about 2%. The 16 is the **rank**, how many directions of change the strips can express. Strips go on seven grids per layer across 28 layers: 196 pairs, 18.5 million numbers, 1.18% of the model. Only those learn. Saved to disk they are the **adapter**, about 70 MB.
 >
 > **QLoRA** stores the frozen base in 4 bits instead of 16, shrinking it from about 3 GB to under 1 GB in GPU memory. The rounding is lossy but small, and the strips stay in full precision. On a free T4 with 15 GB, that is the difference between running and not running.
 >
@@ -262,7 +251,7 @@ flowchart LR
 > What loss cannot see: whether the note is true to the conversation. It measures fit to the reference notes, and the reference notes contain facts the conversations lack. That is why the loss curve looked perfect and the blind comparison did not.
 
 > [!IMPORTANT]
-> **🧑‍💻 Explain like I'm a practitioner.** Update rule: W = W₀ + (α / r) · B A, with B initialised to zero so step 0 equals the base. Defaults used here, from the Unsloth Qwen2.5 notebook: r 16, α 16, dropout 0, all seven attention and MLP projections, learning rate 2e-4, linear warmup over 5% of steps then linear decay, 2 epochs, effective batch 8, max length 2,048, fp16 (the T4 has no bf16), seed 3407, loss on assistant tokens only, best-validation checkpoint kept. Training took 15 min 20 s on a T4.
+> **🧑‍💻 In practice.** Update rule: W = W₀ + (α / r) · B A, with B initialised to zero so step 0 equals the base. Defaults used here, from the Unsloth Qwen2.5 notebook: r 16, α 16, dropout 0, all seven attention and MLP projections, learning rate 2e-4, linear warmup over 5% of steps then linear decay, 2 epochs, effective batch 8, max length 2,048, fp16 (the T4 has no bf16), seed 3407, loss on assistant tokens only, best-validation checkpoint kept. Training took 15 min 20 s on a T4.
 >
 > Read the curve for three things: validation flattening (stop point), validation rising while training falls (memorising: keep the earlier checkpoint, fewer epochs next time), and the train-validation gap (0.1 nats here, small). One gradient spike at the epoch boundary is normal and recovered in a step.
 >
@@ -279,26 +268,25 @@ python -c "import json; c=json.load(open('results/train_config.json')); print(c[
 
 **In this repo.** `src/lora_eval_lab/train.py`: `CONFIG`, `to_text`, `train`. `results/train_config.json`, `results/train_log.jsonl`. Hyperparameter reasoning: `DECISIONS.md`, "Training hyperparameters".
 
-> [!NOTE]
-> **Check yourself.**
->
-> <details><summary><i>What LoRA changes and what it leaves alone, why 4-bit, what the adapter file is, and roughly how long training took?</i></summary>
->
-> Only the low-rank strips change; the base is frozen. 4-bit fits the 15 GB T4. The adapter is the saved strips, about 70 MB. Training took 15 minutes 20 seconds for 300 steps.
->
-> </details>
->
-> <details><summary><i>Loss is computed on the assistant turn only. What would the model be spending effort on otherwise?</i></summary>
->
-> Learning to predict the conversation it was given, which dilutes the note-writing signal.
->
-> </details>
->
-> <details><summary><i>Validation loss stops falling while training loss keeps falling: what is happening, and what do we do?</i></summary>
->
-> The model is memorising the training set. Keep the best-validation checkpoint, note it, and use fewer epochs next time.
->
-> </details>
+**Check yourself.**
+
+<details><summary><i>What LoRA changes and what it leaves alone, why 4-bit, what the adapter file is, and roughly how long training took?</i></summary>
+
+Only the low-rank strips change; the base is frozen. 4-bit fits the 15 GB T4. The adapter is the saved strips, about 70 MB. Training took 15 minutes 20 seconds for 300 steps.
+
+</details>
+
+<details><summary><i>Loss is computed on the assistant turn only. What would the model be spending effort on otherwise?</i></summary>
+
+Learning to predict the conversation it was given, which dilutes the note-writing signal.
+
+</details>
+
+<details><summary><i>Validation loss stops falling while training loss keeps falling: what is happening, and what do we do?</i></summary>
+
+The model is memorising the training set. Keep the best-validation checkpoint, note it, and use fewer epochs next time.
+
+</details>
 
 > [!WARNING]
 > **Numbers to remember.**
@@ -346,11 +334,8 @@ sequenceDiagram
     E->>K: open the key, map A/B to base/tuned
 ```
 
-> [!TIP]
-> **🧒 Explain like I'm 12.** Two cooks make the same dish. A taster who knows which cook is famous tastes differently, so hide the labels: plate A and plate B, with a sealed envelope saying which is which. Many tasters also prefer whatever they tried first, so serve the pair again in the other order and count the verdict only if the taster picked the same dish both times. Because the taster is a machine, a person tastes thirty pairs first, blind, so you can say how often the machine agrees with a human.
-
 > [!NOTE]
-> **🧑‍🎓 Explain like I'm 18.** The judge reads the section name, the conversation, the reference note (labelled calibration only), and two candidates labelled A and B. It scores each on faithfulness, completeness, format and concision, 1 to 5, and states a preference or a tie. The **rubric** says faithfulness outranks everything: a shorter note with no invented facts beats a fuller note with one.
+> **🧑‍🎓 The mechanism.** The judge reads the section name, the conversation, the reference note (labelled calibration only), and two candidates labelled A and B. It scores each on faithfulness, completeness, format and concision, 1 to 5, and states a preference or a tie. The **rubric** says faithfulness outranks everything: a shorter note with no invented facts beats a fuller note with one.
 >
 > **Blinding.** A seeded draw decides per pair whether the tuned note is A or B. The mapping is the key, written once and read only by the scoring code after all verdicts exist. Neither the judge nor the owner sees it.
 >
@@ -361,7 +346,7 @@ sequenceDiagram
 > The trade-off: the kept-only win rate is computed on fewer pairs, and the judge remains one model with its own tastes. Fluency bias survives blinding and swapping.
 
 > [!IMPORTANT]
-> **🧑‍💻 Explain like I'm a practitioner.** Estimand: P(tuned preferred over base). Blind with a seeded Bernoulli(0.5) per item stored apart from verdicts. Query the judge under both orderings; keep item i only if both map to the same element of {tuned, base, tie}; report the drop count and its direction; run a sensitivity with dropped items as ties (Zheng et al. 2023 use swap-and-agree; Wang et al. 2023 quantify the effect). Calibrate with a human subset scored before the judge, and report raw agreement and Cohen's kappa with n.
+> **🧑‍💻 In practice.** Estimand: P(tuned preferred over base). Blind with a seeded Bernoulli(0.5) per item stored apart from verdicts. Query the judge under both orderings; keep item i only if both map to the same element of {tuned, base, tie}; report the drop count and its direction; run a sensitivity with dropped items as ties (Zheng et al. 2023 use swap-and-agree; Wang et al. 2023 quantify the effect). Calibrate with a human subset scored before the judge, and report raw agreement and Cohen's kappa with n.
 >
 > Show the reference for format calibration but instruct the judge to score faithfulness against the input only, then spot-check items where the reference contains facts absent from the input. Here two such items scored faithfulness 5: the judge missed them. Judge with temperature 0 and a JSON schema, keep the raw reply on every row, and write each verdict as it lands so the run resumes.
 >
@@ -378,26 +363,25 @@ python -m lora_eval_lab.judge --human   # refuses: the filled pack exists; pass 
 
 **In this repo.** `src/lora_eval_lab/judge.py`: `make_key`, `shown`, `to_model`, `run_judge`, `human_pack`, `parse_human_pack`. `eval/rubric.md`, `eval/judge_prompt.md`. `src/lora_eval_lab/evaluate.py`: `consensus`, `agreement`.
 
-> [!NOTE]
-> **Check yourself.**
->
-> <details><summary><i>Why blinding, why the swap, why a human subset, and what agreement rate you saw?</i></summary>
->
-> So the labels cannot leak into verdicts; to measure position bias rather than assume it away; to anchor the judge to a human reading; raw agreement 0.69, kappa 0.41 on 29 pairs.
->
-> </details>
->
-> <details><summary><i>All 23 dropped judge pairs involved preferring A. What does that tell you about the judge, and what would you say to someone who ran single-pass judging?</i></summary>
->
-> Its bias is one-directional and real. Single-pass judging would have baked that into the win rate with no way to see it.
->
-> </details>
->
-> <details><summary><i>Kappa was 0.41. Would you trust the judge's 171 verdicts more or less than your own 30?</i></summary>
->
-> Kappa measures agreement, not reliability. Lean on the 171 for the estimate, say that judge and human disagree on about three pairs in ten, and keep the 30 as the anchor.
->
-> </details>
+**Check yourself.**
+
+<details><summary><i>Why blinding, why the swap, why a human subset, and what agreement rate you saw?</i></summary>
+
+So the labels cannot leak into verdicts; to measure position bias rather than assume it away; to anchor the judge to a human reading; raw agreement 0.69, kappa 0.41 on 29 pairs.
+
+</details>
+
+<details><summary><i>All 23 dropped judge pairs involved preferring A. What does that tell you about the judge, and what would you say to someone who ran single-pass judging?</i></summary>
+
+Its bias is one-directional and real. Single-pass judging would have baked that into the win rate with no way to see it.
+
+</details>
+
+<details><summary><i>Kappa was 0.41. Would you trust the judge's 171 verdicts more or less than your own 30?</i></summary>
+
+Kappa measures agreement, not reliability. Lean on the 171 for the estimate, say that judge and human disagree on about three pairs in ten, and keep the 30 as the anchor.
+
+</details>
 
 > [!WARNING]
 > **Numbers to remember.**
@@ -448,18 +432,15 @@ python -m lora_eval_lab.judge --human   # refuses: the filled pack exists; pass 
 
 Sections with fewer than ten kept pairs are in `results/metrics.md` and not interpreted.
 
-> [!TIP]
-> **🧒 Explain like I'm 12.** Flip a slightly bent coin 171 times and get 58 heads. Is the coin bent, or was that luck? "58 out of 171" alone cannot tell you. The interval says: if you did this again with a different 171 flips, you would plausibly get anywhere from 46 to 70 heads. If that range includes half, you cannot claim the coin is bent. Ours does not include half, so we can say the fine-tuned model really was preferred less often.
-
 > [!NOTE]
-> **🧑‍🎓 Explain like I'm 18.** The win rate is a proportion on a small sample, so it needs an interval. The **bootstrap** resamples the 171 verdicts with replacement 10,000 times, computes the win rate each time, and takes the 2.5th and 97.5th percentiles. It is seeded, so it reproduces. Width shrinks with the square root of the pair count; nothing else narrows it. **Parity** is when the interval contains 50%. Ours runs 26.9 to 40.9, entirely below 50%, so the write-up says "not parity: fine-tuning made the notes worse as judged blind."
+> **🧑‍🎓 The mechanism.** The win rate is a proportion on a small sample, so it needs an interval. The **bootstrap** resamples the 171 verdicts with replacement 10,000 times, computes the win rate each time, and takes the 2.5th and 97.5th percentiles. It is seeded, so it reproduces. Width shrinks with the square root of the pair count; nothing else narrows it. **Parity** is when the interval contains 50%. Ours runs 26.9 to 40.9, entirely below 50%, so the write-up says "not parity: fine-tuning made the notes worse as judged blind."
 >
 > Per dimension, each pair gives a tuned score and a base score (averaged over the two orderings), and the paired difference gets its own bootstrap interval. Faithfulness fell by 0.37 with an interval that excludes zero. Format and concision did not move, because the base model already writes an acceptable section zero-shot.
 >
 > Per section, History of Present Illness (the ambient-scribe case) went 0.41 tuned to 0.55 base on 44 pairs, interval 0.27 to 0.55 on the tuned share. Past Medical History is the one section the tuned model won. Allergies and Past Surgical History were mostly ties, as they should be when both models write "No known drug allergies".
 
 > [!IMPORTANT]
-> **🧑‍💻 Explain like I'm a practitioner.** Report the win rate over kept pairs with a percentile bootstrap (B = 10,000, seeded), the tie and dropped counts beside it, and a sensitivity line with dropped pairs as ties. The standard error at p = 0.5 is about √(0.25 / n): 0.035 at n = 199, 0.069 at n = 53. Bootstrap each rubric dimension's paired difference too. Break the headline out by section when the sections differ in difficulty; a good overall rate can be mostly one-line sections. State when a subset is too small to interpret.
+> **🧑‍💻 In practice.** Report the win rate over kept pairs with a percentile bootstrap (B = 10,000, seeded), the tie and dropped counts beside it, and a sensitivity line with dropped pairs as ties. The standard error at p = 0.5 is about √(0.25 / n): 0.035 at n = 199, 0.069 at n = 53. Bootstrap each rubric dimension's paired difference too. Break the headline out by section when the sections differ in difficulty; a good overall rate can be mostly one-line sections. State when a subset is too small to interpret.
 >
 > Assumptions: pairs are exchangeable; the bootstrap treats them as i.i.d., which a mixed section distribution mildly violates (the per-section table is the mitigation).
 
@@ -474,20 +455,19 @@ python -m lora_eval_lab.evaluate   # prints the tables; kept 171, dropped 23
 
 **In this repo.** `src/lora_eval_lab/evaluate.py`: `rates`, `bootstrap_ci`, `dimension_table`, `per_section`, `compute`, `render`. Output: `results/metrics.json`, `results/metrics.md`.
 
-> [!NOTE]
-> **Check yourself.**
->
-> <details><summary><i>A win rate of 0.56 with an interval of 0.48 to 0.64: what do you write in the README, and why is the interval that wide?</i></summary>
->
-> "Preferred in 56% (95% CI 48 to 64); the interval includes 50%, so no preference is shown." Wide because 199 judged pairs is few.
->
-> </details>
->
-> <details><summary><i>The win rate is 33.9% with an interval of 26.9 to 40.9. What does the README say, and why is it not parity?</i></summary>
->
-> "The interval excludes 50%, so this is not parity: fine-tuning made the notes worse as judged blind." Parity would need the interval to contain 50%.
->
-> </details>
+**Check yourself.**
+
+<details><summary><i>A win rate of 0.56 with an interval of 0.48 to 0.64: what do you write in the README, and why is the interval that wide?</i></summary>
+
+"Preferred in 56% (95% CI 48 to 64); the interval includes 50%, so no preference is shown." Wide because 199 judged pairs is few.
+
+</details>
+
+<details><summary><i>The win rate is 33.9% with an interval of 26.9 to 40.9. What does the README say, and why is it not parity?</i></summary>
+
+"The interval excludes 50%, so this is not parity: fine-tuning made the notes worse as judged blind." Parity would need the interval to contain 50%.
+
+</details>
 
 > [!WARNING]
 > **Numbers to remember.**
@@ -517,11 +497,8 @@ python -m lora_eval_lab.evaluate   # prints the tables; kept 171, dropped 23
 | **Precision** | Shared / words in the candidate | |
 | **F1** | The harmonic mean of the two | base 0.183, tuned 0.282 |
 
-> [!TIP]
-> **🧒 Explain like I'm 12.** Imagine a teacher who marks your essay by laying it beside the model answer and counting how many words you both used, in the same order. Copy the model answer and you get full marks. Write something truer in your own words and you score badly. Invent a sentence that sounds like the model answer and you score well. That teacher is ROUGE. Fast, never argues, cannot tell right from wrong.
-
 > [!NOTE]
-> **🧑‍🎓 Explain like I'm 18.** Split both texts into words. Find the **longest common subsequence**. Then:
+> **🧑‍🎓 The mechanism.** Split both texts into words. Find the **longest common subsequence**. Then:
 
 ```
 P  = shared / words in candidate
@@ -534,7 +511,7 @@ F1 = 2 · P · R / (P + R)
 > Why up here means worse: the references contain ages, dates and doses the conversations never state. A tuned output that copies that shape shares more words in order with the reference, so ROUGE rises, while stating facts the patient never said, so faithfulness falls. The base model, in its own words, matched fewer words and invented less.
 
 > [!IMPORTANT]
-> **🧑‍💻 Explain like I'm a practitioner.** Use ROUGE as a sanity check that outputs are in the neighbourhood of the target (not empty, not chat), and for drift between runs of an unchanged task. Never as a quality result on a task where facts matter, and never on a dataset whose references contain material the inputs lack. Record casing, stemming and stopword choices (none here). Report it beside a preference or faithfulness result with the sentence "rewards overlap, not correctness".
+> **🧑‍💻 In practice.** Use ROUGE as a sanity check that outputs are in the neighbourhood of the target (not empty, not chat), and for drift between runs of an unchanged task. Never as a quality result on a task where facts matter, and never on a dataset whose references contain material the inputs lack. Record casing, stemming and stopword choices (none here). Report it beside a preference or faithfulness result with the sentence "rewards overlap, not correctness".
 >
 > How it goes wrong: ROUGE rises while blind preference falls (this project); paraphrase penalised; length games raising recall.
 
@@ -549,14 +526,13 @@ pytest -q -k rouge   # 2 passed: the hand-worked 2/3 and 6/7
 
 **In this repo.** `src/lora_eval_lab/evaluate.py`: `lcs_length`, `rouge_l`. Tests: `test_lcs_by_hand`, `test_rouge_l_by_hand` in `tests/test_evaluate.py`.
 
-> [!NOTE]
-> **Check yourself.**
->
-> <details><summary><i>ROUGE-L went up while preference went down. Explain to a colleague why both can be true at once, using this dataset.</i></summary>
->
-> ROUGE measures similarity to the reference; the references hold facts absent from the conversations; the tuned model matched the reference more and the conversation less. Preference is the blind judge's choice against the conversation.
->
-> </details>
+**Check yourself.**
+
+<details><summary><i>ROUGE-L went up while preference went down. Explain to a colleague why both can be true at once, using this dataset.</i></summary>
+
+ROUGE measures similarity to the reference; the references hold facts absent from the conversations; the tuned model matched the reference more and the conversation less. Preference is the blind judge's choice against the conversation.
+
+</details>
 
 > [!WARNING]
 > **Numbers to remember.**
@@ -587,18 +563,15 @@ pytest -q -k rouge   # 2 passed: the hand-worked 2/3 and 6/7
 | Other | 5 | Correct content, the judge preferred the base model's phrasing |
 | Wrong section | 1 | Reason for visit written into Other History |
 
-> [!TIP]
-> **🧒 Explain like I'm 12.** The score tells you whether the new model is better. It does not tell you *how* it is worse when it loses. So we took every question it lost, read each one, and wrote down one reason: made something up, left something out, wrote the wrong part, did not look like a note, or something else. Most of the time it made something up.
-
 > [!NOTE]
-> **🧑‍🎓 Explain like I'm 18.** The judge is the instrument under test, so asking it to explain its own marks would add a second unchecked opinion. The losses were labelled by the implementing agent (a different model from the judge) reading the conversation, both notes and the judge's two reasons, one label per pair, the dominant failure where several apply. The owner audited a seeded random 15 and agreed on all 15. That provenance is stated wherever the table appears.
+> **🧑‍🎓 The mechanism.** The judge is the instrument under test, so asking it to explain its own marks would add a second unchecked opinion. The losses were labelled by the implementing agent (a different model from the judge) reading the conversation, both notes and the judge's two reasons, one label per pair, the dominant failure where several apply. The owner audited a seeded random 15 and agreed on all 15. That provenance is stated wherever the table appears.
 >
 > Why losses only: the question is "what got worse", and 88 is few enough to read every one.
 >
 > Two data reasons the model learned to invent. First, the notes were written before the conversations, so a reference can state an age or a date the conversation never mentions; training on that pair rewards writing specifics that are not in the input. Second, the references follow a fixed template with slots ("The patient is a NN-year-old [race] [sex] who presents with..."), and the model learned to fill every slot whether or not the conversation supplied it. Two held-out outputs state an exact age that appears in the reference and nowhere in the conversation; the judge scored both faithfulness 5.
 
 > [!IMPORTANT]
-> **🧑‍💻 Explain like I'm a practitioner.** Define the categories before reading (here: hallucinated fact, omitted fact, wrong section, format break, other), label the dominant failure per item, state who labelled and audit a random subset with a second reader, and report the agreement. Read the losses, not the wins; wins do not answer "what got worse". Then trace the top category back to the data: here, unsupported specifics in the targets and a slot-filling template.
+> **🧑‍💻 In practice.** Define the categories before reading (here: hallucinated fact, omitted fact, wrong section, format break, other), label the dominant failure per item, state who labelled and audit a random subset with a second reader, and report the agreement. Read the losses, not the wins; wins do not answer "what got worse". Then trace the top category back to the data: here, unsupported specifics in the targets and a slot-filling template.
 >
 > What follows from it, in order: a one-shot prompted base to set the real bar; strip unsupported specifics from the references and retrain with the identical recipe; a preference stage that rewards "shorter and true" over "fuller and invented". Not retrieval: nothing is missing from the prompt, the failure is invented knowledge.
 
@@ -613,20 +586,19 @@ python -m lora_eval_lab.evaluate --taxonomy   # refuses: losses.md holds labels;
 
 **In this repo.** `results/losses.md` (every loss, the judge's reasons, the label, the provenance note). `src/lora_eval_lab/evaluate.py`: `losses_pack`, `parse_labels`. `DECISIONS.md` entries of 2026-08-28 and 2026-08-30.
 
-> [!NOTE]
-> **Check yourself.**
->
-> <details><summary><i>Why is the failure taxonomy hand-labelled rather than asked of the judge, and why over losses specifically?</i></summary>
->
-> The judge cannot audit itself; losses are the "what got worse" question and are few enough to read in full.
->
-> </details>
->
-> <details><summary><i>The tuned model lost on faithfulness. Give two reasons from the data (not from the model) why fine-tuning on MTS-Dialog could teach a model to invent.</i></summary>
->
-> References contain facts absent from the conversations (notes first, dialogues written after); references follow a slot-filling template.
->
-> </details>
+**Check yourself.**
+
+<details><summary><i>Why is the failure taxonomy hand-labelled rather than asked of the judge, and why over losses specifically?</i></summary>
+
+The judge cannot audit itself; losses are the "what got worse" question and are few enough to read in full.
+
+</details>
+
+<details><summary><i>The tuned model lost on faithfulness. Give two reasons from the data (not from the model) why fine-tuning on MTS-Dialog could teach a model to invent.</i></summary>
+
+References contain facts absent from the conversations (notes first, dialogues written after); references follow a slot-filling template.
+
+</details>
 
 > [!WARNING]
 > **Numbers to remember.**
@@ -656,14 +628,11 @@ python -m lora_eval_lab.evaluate --taxonomy   # refuses: losses.md holds labels;
 | ROUGE-L via longest common subsequence | Unsloth's training kernels |
 | Cohen's kappa over three labels | |
 
-> [!TIP]
-> **🧒 Explain like I'm 12.** At a science fair, "an app told me 34%" makes the judge trust the app. Showing the two rulers, the two numbers and the division lets the judge check you in ten seconds. A hand-rolled metric is the second kind: you write the small piece of maths yourself and keep a worked example beside it.
-
 > [!NOTE]
-> **🧑‍🎓 Explain like I'm 18.** An evaluation score is a function: verdicts in, number out. Import it and you inherit options you did not choose (library ROUGE has stemming and tokenisation settings that change the number). Write it, ten to forty lines, and test it against a value you computed on paper, and the test is the proof that the code matches the maths. The rule that stops this becoming silly: hand-roll what is a formula, import what is a trained model.
+> **🧑‍🎓 The mechanism.** An evaluation score is a function: verdicts in, number out. Import it and you inherit options you did not choose (library ROUGE has stemming and tokenisation settings that change the number). Write it, ten to forty lines, and test it against a value you computed on paper, and the test is the proof that the code matches the maths. The rule that stops this becoming silly: hand-roll what is a formula, import what is a trained model.
 
 > [!IMPORTANT]
-> **🧑‍💻 Explain like I'm a practitioner.** Kappa: κ = (p_o − p_e) / (1 − p_e), with p_e from each rater's marginal label frequencies. Worked check in the tests: ten items, human 6/3/1 and judge 5/4/1 across tuned/base/tie, p_o = 0.90, p_e = (30 + 12 + 1) / 100 = 0.43, κ = 0.47 / 0.57 = 0.82. Two raters who both say "tuned" every time have p_o = p_e = 1 and κ = 0. Bootstrap: degenerate inputs (all wins) must give [1, 1]; a 60/40 split on 100 items must land near 0.60 ± 0.10 by the normal approximation. ROUGE-L: "a b c" vs "a b c d" is 6/7.
+> **🧑‍💻 In practice.** Kappa: κ = (p_o − p_e) / (1 − p_e), with p_e from each rater's marginal label frequencies. Worked check in the tests: ten items, human 6/3/1 and judge 5/4/1 across tuned/base/tie, p_o = 0.90, p_e = (30 + 12 + 1) / 100 = 0.43, κ = 0.47 / 0.57 = 0.82. Two raters who both say "tuned" every time have p_o = p_e = 1 and κ = 0. Bootstrap: degenerate inputs (all wins) must give [1, 1]; a 60/40 split on 100 items must land near 0.60 ± 0.10 by the normal approximation. ROUGE-L: "a b c" vs "a b c d" is 6/7.
 
 > [!CAUTION]
 > **Common confusion.** Hand-rolling the metric does not validate the judge. It validates the arithmetic. Judge quality is what the human pass is for.
@@ -676,14 +645,13 @@ pytest -q -k "kappa or bootstrap"   # 4 passed, expected values worked by hand
 
 **In this repo.** `tests/test_evaluate.py`: `test_kappa_by_hand`, `test_rouge_l_by_hand`, `test_bootstrap_ci_degenerate_and_containment`. `DECISIONS.md` and the rag-eval-lab entry "Hand-roll BM25 and the metrics, import the encoder".
 
-> [!NOTE]
-> **Check yourself.**
->
-> <details><summary><i>What does Cohen's kappa add over "we agreed 80% of the time"?</i></summary>
->
-> It subtracts the agreement expected from each rater's label habits; two raters who always say "tuned" agree 100% with kappa 0.
->
-> </details>
+**Check yourself.**
+
+<details><summary><i>What does Cohen's kappa add over "we agreed 80% of the time"?</i></summary>
+
+It subtracts the agreement expected from each rater's label habits; two raters who always say "tuned" agree 100% with kappa 0.
+
+</details>
 
 > [!WARNING]
 > **Numbers to remember.**
